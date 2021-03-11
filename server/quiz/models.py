@@ -7,6 +7,11 @@ import inspect
 
 from typing import List, Any
 
+UID_LENGTH = 32
+
+def UidField():
+    return models.CharField(max_length=UID_LENGTH, unique=True)
+
 def TagField(choiceclass: models.TextChoices):
     return models.TextField(max_length=32, choices=choiceclass.choices)
 
@@ -84,11 +89,14 @@ class Fact(models.Model):
         _validate_tagged_union(self, "fact_type", "_fact")
 
 class Challenge(models.Model):
+    uid = UidField()
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
 
     fact = models.ForeignKey(Fact, on_delete=models.CASCADE)
 
+    active = models.BooleanField(default=True)
     challenge_type = TagField(FactType)
     
     boolean_challenge = models.ForeignKey(BooleanChallenge, on_delete=models.CASCADE, null=True, blank=True)
