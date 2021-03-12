@@ -14,6 +14,7 @@ uvicorn = "^0.13.4"
 gunicorn = "^20.0.4"
 uvloop = "^0.15.2"
 httptools = "^0.1.1"
+whitenoise = "^5.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
