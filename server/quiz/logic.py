@@ -1,6 +1,17 @@
 import secrets
 
-from .models import Fact, BooleanChallenge, NumericChallenge, Challenge
+from .models import (
+    Fact,
+    FactType,
+    BooleanChallenge,
+    NumericChallenge,
+    Challenge,
+    BooleanResponse,
+    NumericResponse,
+    Response,
+)
+
+from .exceptions import BadRequest, AlreadyResponded
 
 def generate_uid():
     return secrets.token_hex(16)
@@ -58,4 +69,48 @@ def discard_current_challenge(user):
         active = True,
         response__isnull = True,
     ).update(active = False)
+
+def respond_to_challenge(user, challenge_uid, response):
+    challenge = Challenge.objects.get(user = user, uid = challenge_uid)
+
+    try:
+        challenge.response
+        raise AlreadyResponded(detail = f"Challenge {challenge_uid} has already gotten a response")
+    except Challenge.response.RelatedObjectDoesNotExist:
+        pass
+
+    k = challenge.challenge_type
+    if list(response) != [k]:
+        raise BadRequest(detail = f"Challenge is of type {k}; got response of other type ({list(response)})")
+
+    response_models = {
+        FactType.BOOLEAN: BooleanResponse,
+        FactType.NUMERIC: NumericResponse,
+    }
+
+    response_cls = response_models[k]
+
+    response_core = _save_and_return(response_cls(
+        challenge = challenge.challenge,
+        **response[k],
+    ))
+    response_field = k + "_response"
+
+    confidence = response_core.confidence_percent
+
+    is_correct = response_core.get_correctness()
+
+    return _save_and_return(Response(
+        user = user,
+        challenge = challenge,
+        confidence_percent = confidence,
+        correct = is_correct,
+        response_type = k,
+        **{response_field: response_core},
+    ))
+
+def get_user_responses(user, limit):
+    return Response.objects.filter(
+        user = user,
+    ).order_by("creation_time").reverse()[:limit]
 

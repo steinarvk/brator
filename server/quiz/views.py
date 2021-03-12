@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from rest_framework.response import Response
@@ -5,10 +7,12 @@ from rest_framework.decorators import action
 from rest_framework import status
 
 from .models import Fact
-from .serializers import FactSerializer, ChallengeSerializer
+from .serializers import FactSerializer, ChallengeSerializer, ScoreSerializer
 
 from .logic import get_or_create_current_challenge
 from .logic import discard_current_challenge
+from .logic import respond_to_challenge
+from .logic import get_user_responses
 
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -32,3 +36,20 @@ class GameViewSet(viewsets.GenericViewSet):
         user = self.request.user
         discard_current_challenge(user)
         return Response(status = status.HTTP_200_OK)
+
+    @action(detail=False, methods=["POST"], url_path="challenges/(?P<challenge_uid>[0-9a-f]+)/response")
+    def response(self, request, challenge_uid):
+        user = self.request.user
+        response = json.loads(self.request.body)
+        respond_to_challenge(user, challenge_uid, response)
+        challenge = get_or_create_current_challenge(user)
+        return Response(ChallengeSerializer(challenge).data)
+
+class EvalViewSet(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["GET"])
+    def scores(self, request):
+        user = self.request.user
+        responses = get_user_responses(user, limit=1000)
+        return Response(ScoreSerializer(responses, many=True).data)

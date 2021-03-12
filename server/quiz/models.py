@@ -37,7 +37,7 @@ def _validate_tagged_union(obj, tag_field, suffix):
         raise ValidationError(f"{class_name}: multiple tagged union fields set: {' '.join(set_field_names)}")
 
 class FactType(models.TextChoices):
-    BOOLEAN = "bool"
+    BOOLEAN = "boolean"
     NUMERIC = "numeric"
 
 class Unit(models.TextChoices):
@@ -61,6 +61,11 @@ class NumericChallenge(models.Model):
 
 class BooleanResponse(models.Model):
     challenge = models.ForeignKey(BooleanChallenge, on_delete=models.CASCADE)
+    answer = models.BooleanField()
+    confidence_percent = ConfidenceField()
+
+    def get_correctness(self):
+        return self.challenge.fact.correct_answer == self.answer
 
 class NumericResponse(models.Model):
     challenge = models.ForeignKey(NumericChallenge, on_delete=models.CASCADE)
@@ -72,6 +77,10 @@ class NumericResponse(models.Model):
     def clean(self):
         if self.ci_low > self.ci_high:
             raise ValidationError(f"Confidence interval is reversed (low: {self.ci_low}, high: {self.ci_high}).")
+
+    def get_correctness(self):
+        x = self.challenge.fact.correct_answer
+        return self.ci_low <= x <= self.ci_high
 
 
 class Fact(models.Model):
@@ -105,16 +114,23 @@ class Challenge(models.Model):
     def clean(self):
         _validate_tagged_union(self, "challenge_type", "_challenge")
 
+    @property
+    def challenge(self):
+        return (
+               self.boolean_challenge
+            or self.numeric_challenge
+        )
+
 class Response(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     challenge = models.OneToOneField(Challenge, on_delete=models.CASCADE)
 
-    response_type = TagField(FactType)
-
     confidence_percent = ConfidenceField()
     correct = models.BooleanField()
+
+    response_type = TagField(FactType)
 
     boolean_response = models.ForeignKey(BooleanResponse, on_delete=models.CASCADE, null=True, blank=True)
     numeric_response = models.ForeignKey(NumericResponse, on_delete=models.CASCADE, null=True, blank=True)

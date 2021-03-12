@@ -1,4 +1,4 @@
-from .models import Fact, Challenge, BooleanChallenge, NumericChallenge, BooleanFact, NumericFact, BooleanResponse, NumericResponse
+from .models import Fact, Challenge, BooleanChallenge, NumericChallenge, BooleanFact, NumericFact, BooleanResponse, NumericResponse, Response
 
 from rest_framework import serializers
 
@@ -11,6 +11,15 @@ class FactSerializer(StripNullsSerializer):
     class Meta:
         model = Fact
         fields = "__all__"
+
+class ScoreSerializer(StripNullsSerializer):
+    class Meta:
+        model = Response
+        fields = [
+            "creation_time",
+            "correct",
+            "confidence_percent",
+        ]
 
 class FactChallengeSerializer(StripNullsSerializer):
     class Meta:

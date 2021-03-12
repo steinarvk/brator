@@ -5,9 +5,9 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register("facts", views.FactViewSet)
-router.register("game", views.GameViewSet, basename="game")
+router.register("quiz", views.GameViewSet, basename="quizz")
+router.register("eval", views.EvalViewSet, basename="eval")
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("api/", include(router.urls)),
 ]
