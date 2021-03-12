@@ -146,4 +146,14 @@ def _register_models(maybe_models: List[Any]):
             continue
         admin.site.register(model)
 
+RESPONSE_MODELS = {
+    FactType.BOOLEAN: BooleanResponse,
+    FactType.NUMERIC: NumericResponse,
+}
+
+FACT_MODELS = {
+    FactType.BOOLEAN: BooleanFact,
+    FactType.NUMERIC: NumericFact,
+}
+
 _register_models(globals().values())

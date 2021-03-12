@@ -7,7 +7,20 @@ class StripNullsSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         return {k: v for k, v in rep.items() if v is not None}
 
-class FactSerializer(StripNullsSerializer):
+class BooleanFactFullSerializer(StripNullsSerializer):
+    class Meta:
+        model = BooleanFact
+        fields = "__all__"
+
+class NumericFactFullSerializer(StripNullsSerializer):
+    class Meta:
+        model = NumericFact
+        fields = "__all__"
+
+class FactFullSerializer(StripNullsSerializer):
+    boolean_fact = BooleanFactFullSerializer()
+    numeric_fact = NumericFactFullSerializer()
+
     class Meta:
         model = Fact
         fields = "__all__"

@@ -9,6 +9,8 @@ from .models import (
     BooleanResponse,
     NumericResponse,
     Response,
+    RESPONSE_MODELS,
+    FACT_MODELS,
 )
 
 from .exceptions import BadRequest, AlreadyResponded
@@ -83,12 +85,7 @@ def respond_to_challenge(user, challenge_uid, response):
     if list(response) != [k]:
         raise BadRequest(detail = f"Challenge is of type {k}; got response of other type ({list(response)})")
 
-    response_models = {
-        FactType.BOOLEAN: BooleanResponse,
-        FactType.NUMERIC: NumericResponse,
-    }
-
-    response_cls = response_models[k]
+    response_cls = RESPONSE_MODELS[k]
 
     response_core = _save_and_return(response_cls(
         challenge = challenge.challenge,
@@ -114,3 +111,25 @@ def get_user_responses(user, limit):
         user = user,
     ).order_by("creation_time").reverse()[:limit]
 
+def post_fact(fact_data):
+    fact_data = dict(fact_data)
+
+    key = fact_data.pop("key")
+
+    if len(fact_data) != 1:
+        raise BadRequest(f"Invalid fact data (unknown type): {' '.join(fact_data)}")
+
+    fact_type = list(fact_data)[0]
+    fact_payload = list(fact_data.values())[0]
+
+    field_name = fact_type + "_fact"
+
+    core = FACT_MODELS[fact_type].objects.create(**fact_payload)
+
+    Fact.objects.filter(key = key).update(active = False)
+    return Fact.objects.create(
+        key = key,
+        active = True,
+        fact_type = fact_type,
+        **{field_name: core},
+    )

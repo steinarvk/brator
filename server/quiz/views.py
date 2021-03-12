@@ -7,20 +7,16 @@ from rest_framework.decorators import action
 from rest_framework import status
 
 from .models import Fact
-from .serializers import FactSerializer, ChallengeSerializer, ScoreSerializer
+from .serializers import FactFullSerializer, ChallengeSerializer, ScoreSerializer
 
 from .logic import get_or_create_current_challenge
 from .logic import discard_current_challenge
 from .logic import respond_to_challenge
 from .logic import get_user_responses
+from .logic import post_fact
 
 from rest_framework import viewsets
 from rest_framework import permissions
-
-class FactViewSet(viewsets.ModelViewSet):
-    queryset = Fact.objects.all().order_by("creation_time")
-    serializer_class = FactSerializer
-    permission_classes = [permissions.IsAdminUser]
 
 class GameViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -53,3 +49,16 @@ class EvalViewSet(viewsets.GenericViewSet):
         user = self.request.user
         responses = get_user_responses(user, limit=1000)
         return Response(ScoreSerializer(responses, many=True).data)
+
+class FactViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAdminUser]
+
+    def list(self, request):
+        facts = Fact.objects.all()
+        data = FactFullSerializer(facts, many=True).data
+        return Response(data)
+
+    def create(self, request):
+        fact_data = json.loads(self.request.body)
+        fact = post_fact(fact_data)
+        return Response(FactFullSerializer(fact).data)
