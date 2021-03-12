@@ -20,7 +20,7 @@ SECRET_KEY = os.environ["BRATOR_SECRET_KEY"]
 
 DEBUG = os.environ.get("BRATOR_DEBUG", "").lower() in ("yes", "true")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = list(x for x in os.environ.get("BRATOR_ALLOWED_HOSTS", "").split(",") if x)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",
-    "quiz",
+    "brator.quiz",
 ]
 
 MIDDLEWARE = [
