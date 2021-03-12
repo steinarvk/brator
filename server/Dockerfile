@@ -11,4 +11,6 @@ RUN poetry install
 
 COPY brator /app/brator
 
+RUN BRATOR_SECRET_KEY=dummy python manage.py collectstatic
+
 CMD ["gunicorn", "brator.asgi:application", "-k", "uvicorn.workers.UvicornWorker"]
