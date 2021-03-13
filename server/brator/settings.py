@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "beeline.middleware.django.HoneyMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,6 +44,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ENVIRONMENT = os.environ.get("BRATOR_ENV_NAME", "unknown_env")
 
 ROOT_URLCONF = 'brator.urls'
 
@@ -129,3 +132,21 @@ REST_FRAMEWORK = {
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+HONEYCOMB_API_KEY = os.environ.get("BRATOR_HONEYCOMB_API_KEY")
+HONEYCOMB_DATASET = os.environ.get("BRATOR_HONEYCOMB_DATASET", ENVIRONMENT)
+HONEYCOMB_SERVICE = os.environ.get("BRATOR_HONEYCOMB_SERVICE", "brator")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
