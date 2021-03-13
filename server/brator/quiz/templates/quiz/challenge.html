@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div>
+		{{ challenge.uid }}
+	</div>
+
+	{% if challenge.boolean_challenge %}
+		{% include "quiz/boolean_challenge.html" with challenge=challenge.boolean_challenge %}
+	{% elif challenge.numeric_challenge %}
+		{% include "quiz/numeric_challenge.html" with challenge=challenge.numeric_challenge %}
+	{% else %}
+		<div class="errormessage">
+			Unknown kind of challenge ({{ challenge.challenge_type }}).
+		</div>
+	{% endif %}
+
+	<form method="post">
+	    {% csrf_token %}
+
+	    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
+
+	    <table>
+		    {{ form.as_table }}
+	    </table>
+
+	    <input type="submit" value="Submit answer">
+	</form>
+{% endblock %}
+

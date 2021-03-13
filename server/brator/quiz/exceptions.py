@@ -9,5 +9,5 @@ class AlreadyResponded(APIException):
     default_detail = "Already responded."
 
 class NoFactsAvailable(APIException):
-    status_code = 404
+    status_code = 500
     default_detail = "No facts available."

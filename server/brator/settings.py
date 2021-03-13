@@ -23,6 +23,7 @@ DEBUG = os.environ.get("BRATOR_DEBUG", "").lower() in ("yes", "true")
 ALLOWED_HOSTS = list(x for x in os.environ.get("BRATOR_ALLOWED_HOSTS", "").split(",") if x)
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     "brator.quiz",
+    "brator.users",
 ]
 
 MIDDLEWARE = [
@@ -150,3 +152,5 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+LOGIN_REDIRECT_URL = "/"
