@@ -120,6 +120,16 @@ class FactsListTest(TestCase):
         assert 200 == resp.status_code
         assert resp.json() == []
 
+    def test_post_same_fact_twice(self):
+        assert Fact.objects.count() == 0
+        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        assert Fact.objects.count() == 1
+        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        assert Fact.objects.count() == 1
+        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[1])
+        assert Fact.objects.count() == 2
+
+
 class QuizResponseTest(TestCase):
     def setUp(self):
         self.user = create_regular_user()

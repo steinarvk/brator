@@ -1,4 +1,6 @@
 import secrets
+import canonicaljson
+import hashlib
 
 from .models import (
     Fact,
@@ -127,6 +129,18 @@ def post_fact(fact_data):
 
     fact_type = list(fact_data)[0]
     fact_payload = list(fact_data.values())[0]
+    fact_hashable_obj = {fact_type: fact_payload}
+    fact_hashable = canonicaljson.encode_canonical_json(fact_hashable_obj)
+
+    fact_hash = hashlib.sha256(fact_hashable).hexdigest()
+
+    old_fact = Fact.objects.filter(
+        key = key,
+        active = True,
+    ).first()
+    if old_fact:
+        if old_fact.version_hash and old_fact.version_hash == fact_hash:
+            return old_fact
 
     field_name = fact_type + "_fact"
 
@@ -136,6 +150,7 @@ def post_fact(fact_data):
     return Fact.objects.create(
         key = key,
         active = True,
+        version_hash = fact_hash,
         fact_type = fact_type,
         **{field_name: core},
     )

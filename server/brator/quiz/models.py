@@ -112,6 +112,8 @@ class Fact(models.Model):
 
     fact_type = TagField(FactType)
 
+    version_hash = models.CharField(max_length = 200, null=True)
+
     boolean_fact = models.ForeignKey(BooleanFact, on_delete=models.CASCADE, null=True, blank=True)
     numeric_fact = models.ForeignKey(NumericFact, on_delete=models.CASCADE, null=True, blank=True)
 

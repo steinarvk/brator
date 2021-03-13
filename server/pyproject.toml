@@ -16,6 +16,7 @@ uvloop = "^0.15.2"
 httptools = "^0.1.1"
 whitenoise = "^5.2.0"
 honeycomb-beeline = "^2.16.2"
+canonicaljson = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
