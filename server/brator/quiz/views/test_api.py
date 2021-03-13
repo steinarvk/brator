@@ -32,7 +32,7 @@ class ViewChallengeTest(TestCase):
     def test_get_no_challenge(self):
         self.client.force_login(self.superuser)
         resp = self.client.get(reverse("quiz:quiz-challenge"))
-        assert resp.status_code == 404
+        assert resp.status_code == 500
 
     def test_not_logged_in(self):
         resp = self.client.get(reverse("quiz:quiz-challenge"))

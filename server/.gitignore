@@ -1,3 +1,4 @@
 /staticfiles/
 /htmlcov/
 /.coverage
+deploy.sh
