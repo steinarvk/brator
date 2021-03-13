@@ -67,10 +67,10 @@ WSGI_APPLICATION = 'brator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': "brator_test",
-        "USER": "brator_test",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.environ.get("BRATOR_DB_NAME", "brator_test"),
+        "USER": os.environ.get("BRATOR_DB_USER", "brator_test"),
+        "HOST": os.environ.get("BRATOR_DB_HOST", "localhost"),
+        "PORT": os.environ.get("BRATOR_DB_PORT", "5432"),
         "PASSWORD": os.environ.get("BRATOR_DB_PASSWORD"),
     }
 }
