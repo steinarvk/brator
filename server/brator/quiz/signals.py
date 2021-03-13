@@ -3,4 +3,4 @@ from django.dispatch import receiver
 
 @receiver(pre_save)
 def validate_model(instance, **kwargs):
-    instance.full_clean()
+    instance.clean()

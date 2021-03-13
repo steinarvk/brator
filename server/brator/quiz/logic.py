@@ -13,7 +13,11 @@ from .models import (
     FACT_MODELS,
 )
 
-from .exceptions import BadRequest, AlreadyResponded
+from .exceptions import (
+    BadRequest,
+    AlreadyResponded,
+    NoFactsAvailable,
+)
 
 def generate_uid():
     return secrets.token_hex(16)
@@ -61,6 +65,8 @@ def get_or_create_current_challenge(user):
 
     if not challenge:
         fact = select_random_fact()
+        if not fact:
+            raise NoFactsAvailable()
         challenge = create_challenge_from_fact(user, fact)
 
     return challenge

@@ -21,10 +21,15 @@ def ConfidenceField():
 def NumericField():
     return models.DecimalField(max_digits=32, decimal_places=2)
 
-def _validate_tagged_union(obj, tag_field, suffix):
+def _validate_tagged_union(obj, choiceclass, tag_field, suffix):
     class_name = obj.__class__.__name__
 
     tag = getattr(obj, tag_field)
+
+    valid = [x[0] for x in choiceclass.choices]
+    if tag not in valid:
+        raise ValidationError(f"{class_name}: {tag_field} has illegal value {tag}; legal values: {' '.join(valid)}")
+
     expected_field = tag + suffix
 
     if not getattr(obj, expected_field, None):
@@ -53,11 +58,20 @@ class NumericFact(models.Model):
     correct_answer_unit = models.CharField(max_length=32, choices = Unit.choices)
     correct_answer = NumericField()
 
+    def clean(self):
+        valid = [x[0] for x in Unit.choices]
+        if self.correct_answer_unit not in valid:
+            raise ValidationError(f"Not a valid unit: {self.correct_answer_unit}.")
+
 class BooleanChallenge(models.Model):
     fact = models.ForeignKey(BooleanFact, on_delete=models.CASCADE)
 
 class NumericChallenge(models.Model):
     fact = models.ForeignKey(NumericFact, on_delete=models.CASCADE)
+
+def _check_confidence(pct):
+    if not (0 < pct < 100):
+        raise ValidationError(f"Confidence value out of bounds or at forbidden extreme ({pct})")
 
 class BooleanResponse(models.Model):
     challenge = models.ForeignKey(BooleanChallenge, on_delete=models.CASCADE)
@@ -67,6 +81,11 @@ class BooleanResponse(models.Model):
     def get_correctness(self):
         return self.challenge.fact.correct_answer == self.answer
 
+    def clean(self):
+        _check_confidence(self.confidence_percent)
+        if self.confidence_percent < 50:
+            raise ValidationError(f"Confidence for boolean question should not be lower than 50%.")
+
 class NumericResponse(models.Model):
     challenge = models.ForeignKey(NumericChallenge, on_delete=models.CASCADE)
 
@@ -75,6 +94,8 @@ class NumericResponse(models.Model):
     ci_high = NumericField()
 
     def clean(self):
+        _check_confidence(self.confidence_percent)
+
         if self.ci_low > self.ci_high:
             raise ValidationError(f"Confidence interval is reversed (low: {self.ci_low}, high: {self.ci_high}).")
 
@@ -95,7 +116,10 @@ class Fact(models.Model):
     numeric_fact = models.ForeignKey(NumericFact, on_delete=models.CASCADE, null=True, blank=True)
 
     def clean(self):
-        _validate_tagged_union(self, "fact_type", "_fact")
+        _validate_tagged_union(self, FactType, "fact_type", "_fact")
+
+        if not self.key:
+            raise ValidationError("No key supplied.")
 
 class Challenge(models.Model):
     uid = UidField()
@@ -112,7 +136,7 @@ class Challenge(models.Model):
     numeric_challenge = models.ForeignKey(NumericChallenge, on_delete=models.CASCADE, null=True, blank=True)
 
     def clean(self):
-        _validate_tagged_union(self, "challenge_type", "_challenge")
+        _validate_tagged_union(self, FactType, "challenge_type", "_challenge")
 
     @property
     def challenge(self):
@@ -136,7 +160,7 @@ class Response(models.Model):
     numeric_response = models.ForeignKey(NumericResponse, on_delete=models.CASCADE, null=True, blank=True)
 
     def clean(self):
-        _validate_tagged_union(self, "response_type", "_response")
+        _validate_tagged_union(self, FactType, "response_type", "_response")
 
 def _register_models(maybe_models: List[Any]):
     for model in maybe_models:

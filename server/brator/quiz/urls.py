@@ -1,13 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from . import views
+from .views import api, web
 
 router = routers.DefaultRouter()
-router.register("facts", views.FactViewSet, basename="facts")
-router.register("quiz", views.GameViewSet, basename="quiz")
-router.register("eval", views.EvalViewSet, basename="eval")
+router.register("facts", api.FactViewSet, basename="facts")
+router.register("quiz", api.GameViewSet, basename="quiz")
+router.register("eval", api.EvalViewSet, basename="eval")
 
+app_name = "quiz"
 urlpatterns = [
-    path("api/", include(router.urls)),
+    path("api/", include(router.urls), name="api"),
+    path("", web.index, name="web-index"),
 ]
