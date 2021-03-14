@@ -57,6 +57,17 @@ def create_numeric_fact():
         ),
     )
 
+def create_custom_numeric_fact(question, answer, unit="none"):
+    return Fact.objects.create(
+        key = "customfact",
+        fact_type = "numeric",
+        numeric_fact = NumericFact.objects.create(
+            question_text = question,
+            correct_answer = answer,
+            correct_answer_unit = unit,
+        ),
+    )
+
 def create_boolean_fact():
     data = dict(DUMMY_BOOLEAN_FACT)
     return Fact.objects.create(
