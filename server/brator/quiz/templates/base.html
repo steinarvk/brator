@@ -17,6 +17,14 @@
 	<p>
 		<a href="{% url 'quiz:web-eval' %}">Evaluation</a>
 	</p>
+
+	{% if user %}
+		{% if user.is_authenticated %}
+			<a href="{% url 'users:logout' %}">Logout</a>
+		{% else %}
+			<a href="{% url 'users:login' %}">Logout</a>
+		{% endif %}
+	{% endif %}
     </div>
 </body>
 </html>
