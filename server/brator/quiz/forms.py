@@ -4,29 +4,22 @@ from django import forms
 from django.forms.widgets import NumberInput
 from django.core.exceptions import ValidationError
 
-MAX_CONFIDENCE = decimal.Decimal("99.99")
-MIN_CONFIDENCE = decimal.Decimal( "0.01")
-
-class RangeInput(NumberInput):
-    input_type = 'range'
-
 class BooleanResponseForm(forms.Form):
-    answer = forms.ChoiceField(choices=[
-        ("False", "False"),
-        ("True", "True"),
-    ], label="Answer")
-    confidence_percent = forms.DecimalField(widget=RangeInput(), label="Confidence (percent)")
+    confidence_percent = forms.DecimalField(widget=NumberInput(), label="Confidence assertion is true (percent)")
 
     def clean(self):
         cleaned_data = super().clean()
 
-        if cleaned_data.get("confidence_percent") == 100:
-            cleaned_data["confidence_percent"] = MAX_CONFIDENCE
-
         conf = cleaned_data.get("confidence_percent")
         
-        if conf < 50 or conf >= 100:
-            raise ValidationError(f"Confidence percentage ({conf}) out of bounds [50, 100>")
+        if conf < 0 or conf > 100:
+            raise ValidationError(f"Confidence percentage ({conf}) out of bounds")
+
+        if conf >= 50:
+            cleaned_data["answer"] = True
+        else:
+            cleaned_data["answer"] = False
+            cleaned_data["confidence_percent"] = 100 - conf
 
         return cleaned_data
 
