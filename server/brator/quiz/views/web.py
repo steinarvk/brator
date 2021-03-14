@@ -4,8 +4,11 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 
-from ..logic import get_or_create_current_challenge
-from ..logic import respond_to_challenge
+from ..logic import (
+    get_or_create_current_challenge,
+    respond_to_challenge,
+    get_last_response,
+)
 from ..forms import CHALLENGE_FORMS
 from ..exceptions import AlreadyResponded
 
@@ -15,6 +18,8 @@ logger = logging.getLogger(__name__)
 def index(request):
     challenge = get_or_create_current_challenge(request.user)
     formclass = CHALLENGE_FORMS[challenge.challenge_type]
+
+    last_response = get_last_response(request.user)
 
     logger.info("Form class is: %s", formclass)
 
@@ -40,6 +45,7 @@ def index(request):
 
     return render(request, "quiz/challenge.html", {
         "user": request.user,
+        "last_response": last_response,
         "form": form,
         "challenge": challenge,
     })

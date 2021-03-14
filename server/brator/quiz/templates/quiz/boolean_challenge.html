@@ -1,3 +1,13 @@
 <div class="question">
 	{{ challenge.fact.question_text }}
 </div>
+
+{% if show_answer %}
+<div class="answer">
+{% if challenge.fact.correct_answer %}
+True
+{% else %}
+False
+{% endif %}
+</div>
+{% endif %}

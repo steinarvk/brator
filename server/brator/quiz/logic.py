@@ -117,6 +117,11 @@ def respond_to_challenge(user, challenge_uid, response):
         **{response_field: response_core},
     ))
 
+def get_last_response(user):
+    return Response.objects.filter(
+        user = user,
+    ).order_by("-creation_time").first()
+
 def get_user_responses(user, limit):
     return Response.objects.filter(
         user = user,

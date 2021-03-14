@@ -1,19 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+	{% if last_response %}
+	{% with resp=last_response chal=last_response.challenge %}
+
+	<div class="feedback">
+	{% include "quiz/challenge_core.html" with challenge=chal show_answer=True %}
+
 	<div>
-		{{ challenge.uid }}
+		Your confidence: {{ resp.confidence_percent }}%
 	</div>
 
-	{% if challenge.boolean_challenge %}
-		{% include "quiz/boolean_challenge.html" with challenge=challenge.boolean_challenge %}
-	{% elif challenge.numeric_challenge %}
-		{% include "quiz/numeric_challenge.html" with challenge=challenge.numeric_challenge %}
-	{% else %}
-		<div class="errormessage">
-			Unknown kind of challenge ({{ challenge.challenge_type }}).
-		</div>
+	<div>
+		Status:
+
+		{% if resp.correct %}
+			Correct
+		{% else %}
+			Incorrect
+		{% endif %}
+	</div>
+
+	{% endwith %}
 	{% endif %}
+
+	<div class="challenge">
+	<h1>Question</h1>
+
+	{% include "quiz/challenge_core.html" with challenge=challenge %}
 
 	<form method="post">
 	    {% csrf_token %}
@@ -26,5 +41,7 @@
 
 	    <input type="submit" value="Submit answer">
 	</form>
+
+	</div>
 {% endblock %}
 
