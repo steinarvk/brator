@@ -120,6 +120,9 @@ class FactCategory(models.Model):
     def active(self):
         return self.number_of_active_facts > 0
 
+    def __str__(self):
+        return f"FactCategory(name={repr(self.name)}, weight={repr(self.weight)})"
+
     def clean(self):
         if not re.match(r"^[a-z-]+$", self.name):
             raise ValidationError(f"Invalid category name: {self.name}")
