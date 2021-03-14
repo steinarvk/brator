@@ -39,21 +39,25 @@ def generate_uid():
 @traced_function
 def select_random_fact():
     cats = [cat for cat in FactCategory.objects.all() if cat.active]
+    logger.info(
+        "Selecting random facts: categories: %s",
+        [(cat.name, float(cat.weight)) for cat in cats],
+    )
+    cat_name = None
     if not cats:
-        return Fact.objects.\
-            filter(active=True).\
-            order_by("?").\
-            first()
-    total_weight = float(sum(cat.weight for cat in cats))
-    x = random.random() * total_weight
-    for cat in cats:
-        x -= float(cat.weight)
-        if x < 0:
-            break
-    return Fact.objects.\
-        filter(active=True, category=cat).\
-        order_by("?").\
-        first()
+        qs = Fact.objects.filter(active=True)
+        logger.info("No categories -- using legacy random selection.")
+    else:
+        total_weight = float(sum(cat.weight for cat in cats))
+        x = random.random() * total_weight
+        for cat in cats:
+            x -= float(cat.weight)
+            if x < 0:
+                break
+        cat_name = cat.name
+        qs = Fact.objects.filter(active=True, category=cat)
+    logger.info("Choosing randomly (from category %s) among %d options", cat_name, qs.count())
+    return qs.order_by("?").first()
 
 @traced_function
 def _save_and_return(x):
@@ -104,12 +108,15 @@ def get_or_create_current_challenge(user):
     return challenge
 
 @traced_function
-def discard_current_challenge(user):
-    return Challenge.objects.filter(
+def discard_current_challenge(user, challenge_uid=None):
+    qs = Challenge.objects.filter(
         user = user,
         active = True,
         response__isnull = True,
-    ).update(active = False)
+    )
+    if challenge_uid:
+        qs = qs.filter(uid = challenge_uid)
+    return qs.update(active = False)
 
 @traced_function
 def respond_to_challenge(user, challenge_uid, response):

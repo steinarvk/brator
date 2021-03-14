@@ -1,12 +1,14 @@
 import logging
 
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 
 from ..logic import (
     get_or_create_current_challenge,
     respond_to_challenge,
+    discard_current_challenge,
     get_last_response,
 )
 from ..forms import CHALLENGE_FORMS
@@ -14,8 +16,19 @@ from ..exceptions import AlreadyResponded
 
 logger = logging.getLogger(__name__)
 
-@login_required
 def index(request):
+    return redirect(reverse("quiz:web-quiz"))
+
+@login_required
+def skip_question(request):
+    if request.method == "POST":
+        challenge_uid = request.POST.get("challenge_uid")
+        discard_current_challenge(request.user, challenge_uid)
+
+    return redirect(reverse("quiz:web-quiz"))
+
+@login_required
+def quiz(request):
     challenge = get_or_create_current_challenge(request.user)
     formclass = CHALLENGE_FORMS[challenge.challenge_type]
 

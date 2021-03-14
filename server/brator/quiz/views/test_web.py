@@ -11,7 +11,16 @@ class IndexTest(TestCase):
 
     def test_index(self):
         create_fact()
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get("/")
+        assert resp.status_code == 302
+
+class ChallengeTest(TestCase):
+    def setUp(self):
+        self.client.force_login(create_regular_user())
+
+    def test_challenge(self):
+        create_fact()
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
 
     def test_get_a_question(self):
@@ -19,7 +28,7 @@ class IndexTest(TestCase):
             "How many roads must a man walk down?",
             4212345
         )
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
         assert b"4212345" not in resp.content
@@ -30,21 +39,21 @@ class IndexTest(TestCase):
             "How many roads must a man walk down?",
             4212345
         )
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
         assert b"4212345" not in resp.content
 
         challenge = Challenge.objects.first()
 
-        resp = self.client.post(reverse("quiz:web-index"), {
+        resp = self.client.post(reverse("quiz:web-quiz"), {
             "challenge_uid": challenge.uid,
             "ci_low": "4112345",
             "ci_high": "4312345",
         })
         assert resp.status_code == 302
 
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
         assert b"4212345" in resp.content
@@ -55,21 +64,21 @@ class IndexTest(TestCase):
             "How many roads must a man walk down?",
             4212345
         )
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
         assert b"4212345" not in resp.content
 
         challenge = Challenge.objects.first()
 
-        resp = self.client.post(reverse("quiz:web-index"), {
+        resp = self.client.post(reverse("quiz:web-quiz"), {
             "challenge_uid": challenge.uid,
             "ci_low": "4412345",
             "ci_high": "5012345",
         })
         assert resp.status_code == 302
 
-        resp = self.client.get(reverse("quiz:web-index"))
+        resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
         assert b"4212345" in resp.content

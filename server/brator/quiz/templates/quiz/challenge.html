@@ -27,6 +27,12 @@
 	    <input type="submit" value="Submit answer">
 	</form>
 
+	<form method="post" action="{% url 'quiz:web-skip' %}" >
+	    {% csrf_token %}
+	    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
+	    <input type="submit" value="Skip question">
+	</form>
+
 	</div>
 {% endblock %}
 
