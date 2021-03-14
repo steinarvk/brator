@@ -1,6 +1,6 @@
 import logging
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 
@@ -34,10 +34,7 @@ def index(request):
                 payload,
             )
 
-            # Challenge was answered; get a new one.
-            challenge = get_or_create_current_challenge(request.user)
-            formclass = CHALLENGE_FORMS[challenge.challenge_type]
-            form = formclass()
+            return redirect(request.path_info)
     else:
         form = formclass()
 
