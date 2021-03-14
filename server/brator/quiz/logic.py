@@ -11,6 +11,7 @@ def traced_function(f):
 
 from .models import (
     Fact,
+    FactCategory,
     FactType,
     BooleanChallenge,
     NumericChallenge,
@@ -150,6 +151,14 @@ def post_fact(fact_data):
 
     key = fact_data.pop("key")
 
+    category_name = None
+    if "category" in fact_data:
+        category_name = fact_data.pop("category")
+
+    category = None
+    if category_name:
+        category, _ = FactCategory.objects.get_or_create(name = category_name)
+
     logger.info("Attempting to post new fact (with key: %s)", key)
 
     if len(fact_data) != 1:
@@ -157,7 +166,10 @@ def post_fact(fact_data):
 
     fact_type = list(fact_data)[0]
     fact_payload = list(fact_data.values())[0]
-    fact_hashable_obj = {fact_type: fact_payload}
+    fact_hashable_obj = {
+        "category": category_name,
+        fact_type: fact_payload,
+    }
     fact_hashable = canonicaljson.encode_canonical_json(fact_hashable_obj)
 
     fact_hash = hashlib.sha256(fact_hashable).hexdigest()
@@ -181,6 +193,7 @@ def post_fact(fact_data):
     return Fact.objects.create(
         key = key,
         active = True,
+        category = category,
         version_hash = fact_hash,
         fact_type = fact_type,
         **{field_name: core},

@@ -99,6 +99,36 @@ class FactsListTest(TestCase):
         assert 200 <= resp.status_code <= 399
         assert resp.json()
 
+    def test_post_good_fact(self):
+        factdata = {
+            "key": "foo",
+            "numeric": {
+                "question_text": "Hmm?",
+                "correct_answer": 42,
+                "correct_answer_unit": "none",
+            },
+        }
+        assert Fact.objects.count() == 0
+        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=factdata)
+        assert 200 <= resp.status_code <= 299
+        assert Fact.objects.count() == 1
+
+    def test_post_good_fact_with_category(self):
+        factdata = {
+            "key": "foo",
+            "category": "my-category",
+            "numeric": {
+                "question_text": "Hmm?",
+                "correct_answer": 42,
+                "correct_answer_unit": "none",
+            },
+        }
+        assert Fact.objects.count() == 0
+        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=factdata)
+        assert 200 <= resp.status_code <= 299
+        assert Fact.objects.count() == 1
+
+
     def test_post_bad_fact(self):
         bad_fact = {
             "key": "foo",

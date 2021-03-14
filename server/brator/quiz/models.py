@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
+import re
 import inspect
 
 from typing import List, Any
@@ -106,11 +107,23 @@ class NumericResponse(models.Model):
         return self.ci_low <= x <= self.ci_high
 
 
+class FactCategory(models.Model):
+    name = models.CharField(max_length = 64, unique=True)
+
+    weight = models.DecimalField(max_digits=8, decimal_places=2, default=1)
+
+    def clean(self):
+        if not re.match(r"^[a-z-]+$", self.name):
+            raise ValidationError(f"Invalid category name: {self.name}")
+
+
 class Fact(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
 
     key = models.CharField(max_length = 200)
     active = models.BooleanField(default=True)
+
+    category = models.ForeignKey(FactCategory, on_delete=models.SET_NULL, null=True)
 
     fact_type = TagField(FactType)
 
