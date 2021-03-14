@@ -1,6 +1,7 @@
 import secrets
 import canonicaljson
 import hashlib
+import datetime
 import logging
 import random
 
@@ -218,3 +219,28 @@ def post_fact(fact_data):
         fact_type = fact_type,
         **{field_name: core},
     )
+
+
+def get_eval_stats_for_scope(user, **kwargs):
+    qs = Response.objects.filter(user=user, **kwargs)
+    objs = list(qs.all())
+    correct = [o for o in objs if o.correct]
+    expected = sum([o.confidence_percent/100 for o in objs])
+    return {
+        "number_of_answers": len(objs),
+        "number_of_correct_answers": len(correct),
+        "expected_correct_answers": expected,
+    }
+
+def get_eval_stats(user):
+    now = datetime.datetime.now()
+    cutoff_24h = now - datetime.timedelta(hours=24)
+    rv = {
+        "stats": {
+            "total": get_eval_stats_for_scope(user),
+            "24h": get_eval_stats_for_scope(user, creation_time__gte=cutoff_24h),
+        },
+    }
+    logger.info("Returning evaluation stats: %s", repr(rv))
+    return rv
+

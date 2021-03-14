@@ -1,0 +1,21 @@
+<div class="stats">
+	{% if header %}
+	  <h1>{{ header }}</h1>
+	{% endif %}
+
+	{% if stats.number_of_answers %}
+	<table>
+		<tr>
+			<td>Questions answered
+			<td>{{ stats.number_of_answers }}
+		<tr>
+			<td>Correct answers
+			<td>{{ stats.number_of_correct_answers }}
+		<tr>
+			<td>Expected correct answers
+			<td>{{ stats.expected_correct_answers }}
+	</table>
+	{% else %}
+	No data.
+	{% endif %}
+</div>

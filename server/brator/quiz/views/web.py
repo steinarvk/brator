@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 from ..logic import (
     get_or_create_current_challenge,
+    get_eval_stats,
     respond_to_challenge,
     discard_current_challenge,
     get_last_response,
@@ -63,3 +64,8 @@ def quiz(request):
         "challenge": challenge,
     })
 
+@login_required
+def eval_results(request):
+    context = get_eval_stats(request.user)
+    context["user"] = request.user
+    return render(request, "quiz/eval.html", context)

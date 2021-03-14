@@ -83,3 +83,12 @@ class ChallengeTest(TestCase):
         assert b"How many roads" in resp.content
         assert b"4212345" in resp.content
         assert b"Incorrect" in resp.content
+
+class EvalTest(TestCase):
+    def setUp(self):
+        self.client.force_login(create_regular_user())
+
+    def test_index(self):
+        resp = self.client.get(reverse("quiz:web-eval"))
+        assert resp.status_code == 200
+

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block titlesuffix %} - Evaluation{% endblock %}
+
+{% block content %}
+  {% include "quiz/evalstats.html" with stats=stats.total header='Overall' %}
+  {% include "quiz/evalstats.html" with stats=stats.24h header='Last 24h' %}
+{% endblock %}
