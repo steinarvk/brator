@@ -48,6 +48,7 @@ class FactType(models.TextChoices):
 class Unit(models.TextChoices):
     NONE = "none"
     GRAMS_PER_CC = "g/cm³"
+    SQUARE_KM = "sq km"
 
 class BooleanFact(models.Model):
     question_text = models.TextField()
