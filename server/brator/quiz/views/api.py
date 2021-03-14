@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
@@ -17,6 +18,8 @@ from ..logic import post_fact
 
 from rest_framework import viewsets
 from rest_framework import permissions
+
+logger = logging.getLogger(__name__)
 
 class GameViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -60,5 +63,6 @@ class FactViewSet(viewsets.ViewSet):
 
     def create(self, request):
         fact_data = json.loads(self.request.body)
+        logger.info("Creating fact: %s", repr(fact_data))
         fact = post_fact(fact_data)
         return Response(FactFullSerializer(fact).data)

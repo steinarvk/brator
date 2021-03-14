@@ -1,6 +1,7 @@
 import secrets
 import canonicaljson
 import hashlib
+import logging
 
 from .models import (
     Fact,
@@ -20,6 +21,8 @@ from .exceptions import (
     AlreadyResponded,
     NoFactsAvailable,
 )
+
+logger = logging.getLogger(__name__)
 
 def generate_uid():
     return secrets.token_hex(16)
@@ -124,6 +127,8 @@ def post_fact(fact_data):
 
     key = fact_data.pop("key")
 
+    logger.info("Attempting to post new fact (with key: %s)", key)
+
     if len(fact_data) != 1:
         raise BadRequest(f"Invalid fact data (unknown type): {' '.join(fact_data)}")
 
@@ -134,12 +139,15 @@ def post_fact(fact_data):
 
     fact_hash = hashlib.sha256(fact_hashable).hexdigest()
 
+    logger.info("Attempting to post new fact (with key: %s, hash: %s)", key, fact_hash)
+
     old_fact = Fact.objects.filter(
         key = key,
         active = True,
     ).first()
     if old_fact:
         if old_fact.version_hash and old_fact.version_hash == fact_hash:
+            logger.info("Attempting to post new fact (with key: %s, hash: %s): rejected, same as active fact", key, fact_hash)
             return old_fact
 
     field_name = fact_type + "_fact"
