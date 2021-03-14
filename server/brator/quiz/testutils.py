@@ -5,6 +5,7 @@ from .models import Fact, NumericFact, BooleanFact
 
 DUMMY_NUMERIC_FACT = {
     "key": "human-legs",
+    "category": "legs-question",
     "numeric": {
         "question_text": "How many legs does a human have?",
         "correct_answer": 2,
@@ -14,6 +15,7 @@ DUMMY_NUMERIC_FACT = {
 
 DUMMY_BOOLEAN_FACT = {
     "key": "isaac-18th",
+    "category": "scientist-question",
     "boolean": {
         "question_text": "Did Isaac Newton live in the 18th century?",
         "correct_answer": True,
@@ -25,6 +27,7 @@ DUMMY_FACT_DATA = [
     DUMMY_BOOLEAN_FACT,
     {
         "key": "spider-legs",
+        "category": "legs-question",
         "numeric": {
             "question_text": "How many legs does a spider have?",
             "correct_answer": 8,

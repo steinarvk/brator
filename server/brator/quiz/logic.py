@@ -2,6 +2,7 @@ import secrets
 import canonicaljson
 import hashlib
 import logging
+import random
 
 import beeline
 
@@ -37,8 +38,20 @@ def generate_uid():
 
 @traced_function
 def select_random_fact():
+    cats = [cat for cat in FactCategory.objects.all() if cat.active]
+    if not cats:
+        return Fact.objects.\
+            filter(active=True).\
+            order_by("?").\
+            first()
+    total_weight = float(sum(cat.weight for cat in cats))
+    x = random.random() * total_weight
+    for cat in cats:
+        x -= float(cat.weight)
+        if x < 0:
+            break
     return Fact.objects.\
-        filter(active=True).\
+        filter(active=True, category=cat).\
         order_by("?").\
         first()
 

@@ -112,6 +112,14 @@ class FactCategory(models.Model):
 
     weight = models.DecimalField(max_digits=8, decimal_places=2, default=1)
 
+    @property
+    def number_of_active_facts(self):
+        return self.fact_set.filter(active=True).count()
+
+    @property
+    def active(self):
+        return self.number_of_active_facts > 0
+
     def clean(self):
         if not re.match(r"^[a-z-]+$", self.name):
             raise ValidationError(f"Invalid category name: {self.name}")
