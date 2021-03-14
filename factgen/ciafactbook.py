@@ -42,6 +42,7 @@ def get_country_population_facts():
         text = f"What is the total population of {name}? [Total population according to the CIA World Factbook, as of {datestamp}.]"
         yield {
             "key": "cia-population-" + "-".join(name.split()).lower(),
+            "category": "cia-position",
             "numeric": {
                 "question_text": text,
                 "correct_answer": int(population),
@@ -72,6 +73,7 @@ def get_capital_location_facts():
 
         yield {
             "key": "cia-capital-latitude-" + "-".join(full_name.split(", ")).lower(),
+            "category": "cia-capital-position",
             "numeric": {
                 "question_text": question,
                 "correct_answer": lat,
@@ -95,6 +97,7 @@ def get_land_area_facts():
 
         yield {
             "key": key,
+            "category": "cia-area",
             "numeric": {
                 "question_text": text,
                 "correct_answer": land_area,
@@ -126,6 +129,7 @@ def get_demographics_facts():
 
             yield {
                 "key": key,
+                "category": "cia-demographics",
                 "numeric": {
                     "question_text": question,
                     "correct_answer": pct,
