@@ -1,0 +1,22 @@
+<div class="question">
+	{% block question %}
+	{% endblock %}
+</div>
+
+{% if show_response_answer %}
+<div class="user-answer">
+	Response:
+
+	{% block useranswer %}
+	{% endblock %}
+</div>
+{% endif %}
+
+{% if show_answer %}
+<div class="correct-answer">
+	Correct answer:
+
+	{% block correctanswer %}
+	{% endblock %}
+</div>
+{% endif %}

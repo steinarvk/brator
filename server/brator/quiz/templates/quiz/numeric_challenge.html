@@ -1,23 +1,24 @@
-<div class="question">
-	{{ challenge.fact.question_text }}
-</div>
+{% extends "quiz/challenge_base.html" %}
 
-{% with x=show_response_answer %}
-{% if x %}
-<div class="user-answer">
-	Your answer ({{ x.confidence_percent }}% CI):
-	{% with low=x.numeric_response.ci_low high=x.numeric_response.ci_high %}
+{% block question %}
+	{{ challenge.fact.question_text }}
+{% endblock %}
+
+{% if show_response_answer %}
+{% block useranswer %}
+	{% with low=show_response_answer.numeric_response.ci_low high=show_response_answer.numeric_response.ci_high %}
 		{% if low == high %}
 			exactly {{ low }}
 		{% else %}
 			{{ low }} to {{ high }}
+			({{ show_response_answer.confidence_percent }}% CI)
 		{% endif %}
 	{% endwith %}
-</div>
+{% endblock %}
 {% endif %}
-{% endwith %}
 
 {% if show_answer %}
-<div class="answer">
-{{ challenge.fact.correct_answer }}
+{% block correctanswer %}
+	{{ challenge.fact.correct_answer }}
+{% endblock %}
 {% endif %}

@@ -3,26 +3,11 @@
 {% block content %}
 
 	{% if last_response %}
-	{% with resp=last_response chal=last_response.challenge %}
 
 	<div class="feedback">
-	{% include "quiz/challenge_core.html" with challenge=chal show_answer=True show_response_answer=resp %}
-
-	<div>
-		Your confidence: {{ resp.confidence_percent }}%
+	{% include "quiz/challenge_core.html" with challenge=last_response.challenge show_answer=True show_response_answer=last_response %}
 	</div>
 
-	<div>
-		Status:
-
-		{% if resp.correct %}
-			Correct
-		{% else %}
-			Incorrect
-		{% endif %}
-	</div>
-
-	{% endwith %}
 	{% endif %}
 
 	<div class="challenge">

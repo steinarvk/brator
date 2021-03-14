@@ -1,21 +1,21 @@
-<div class="question">
-	{{ challenge.fact.question_text }}
-</div>
+{% extends "quiz/challenge_base.html" %}
 
-{% with x=show_response_answer %}
-{% if x %}
-<div class="user-answer">
-	Your answer: {{ x.boolean_response.answer }}
-</div>
+{% block question %}
+	{{ challenge.fact.question_text }}
+{% endblock %}
+
+{% if show_response_answer %}
+{% block useranswer %}
+	{{ show_response_answer.boolean_response.answer }}
+{% endblock %}
 {% endif %}
-{% endwith %}
 
 {% if show_answer %}
-<div class="correct-answer">
-{% if challenge.fact.correct_answer %}
-True
-{% else %}
-False
-{% endif %}
-</div>
+{% block correctanswer %}
+	{% if challenge.fact.correct_answer %}
+	True
+	{% else %}
+	False
+	{% endif %}
+{% endblock %}
 {% endif %}

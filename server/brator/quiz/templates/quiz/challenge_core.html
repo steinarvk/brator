@@ -7,3 +7,19 @@
 		Unknown kind of challenge ({{ challenge.challenge_type }}).
 	</div>
 {% endif %}
+
+{% if show_response_answer %}
+<div>
+	Your confidence: {{ show_response_answer.confidence_percent }}%
+</div>
+
+<div>
+	Status:
+
+	{% if show_response_answer.correct %}
+		Correct
+	{% else %}
+		Incorrect
+	{% endif %}
+</div>
+{% endif %}
