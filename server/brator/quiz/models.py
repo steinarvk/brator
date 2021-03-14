@@ -51,6 +51,12 @@ class Unit(models.TextChoices):
     GRAMS_PER_CC = "g/cm³"
     SQUARE_KM = "sq km"
     PERCENT = "percent"
+    KELVIN = "kelvin"
+    CELSIUS = "celsius"
+    METERS = "meters"
+    MINUTES = "minutes"
+    SECONDS = "seconds"
+    GRAMS = "grams"
 
 class BooleanFact(models.Model):
     question_text = models.TextField()
