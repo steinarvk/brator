@@ -5,8 +5,18 @@
 </head>
 
 <body>
-    <div id="content">
+    <div class="content">
         {% block content %}{% endblock %}
+    </div>
+
+    <div class="navlinks">
+	<p>
+		<a href="{% url 'quiz:web-quiz' %}">Quiz</a>
+	</p>
+
+	<p>
+		<a href="{% url 'quiz:web-eval' %}">Evaluation</a>
+	</p>
     </div>
 </body>
 </html>
