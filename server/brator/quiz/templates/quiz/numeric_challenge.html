@@ -2,6 +2,21 @@
 	{{ challenge.fact.question_text }}
 </div>
 
+{% with x=show_response_answer %}
+{% if x %}
+<div class="user-answer">
+	Your answer ({{ x.confidence_percent }}% CI):
+	{% with low=x.numeric_response.ci_low high=x.numeric_response.ci_high %}
+		{% if low == high %}
+			exactly {{ low }}
+		{% else %}
+			{{ low }} to {{ high }}
+		{% endif %}
+	{% endwith %}
+</div>
+{% endif %}
+{% endwith %}
+
 {% if show_answer %}
 <div class="answer">
 {{ challenge.fact.correct_answer }}

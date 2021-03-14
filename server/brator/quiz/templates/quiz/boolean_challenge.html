@@ -2,8 +2,16 @@
 	{{ challenge.fact.question_text }}
 </div>
 
+{% with x=show_response_answer %}
+{% if x %}
+<div class="user-answer">
+	Your answer: {{ x.boolean_response.answer }}
+</div>
+{% endif %}
+{% endwith %}
+
 {% if show_answer %}
-<div class="answer">
+<div class="correct-answer">
 {% if challenge.fact.correct_answer %}
 True
 {% else %}

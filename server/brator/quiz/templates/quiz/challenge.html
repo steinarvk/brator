@@ -6,7 +6,7 @@
 	{% with resp=last_response chal=last_response.challenge %}
 
 	<div class="feedback">
-	{% include "quiz/challenge_core.html" with challenge=chal show_answer=True %}
+	{% include "quiz/challenge_core.html" with challenge=chal show_answer=True show_response_answer=resp %}
 
 	<div>
 		Your confidence: {{ resp.confidence_percent }}%
