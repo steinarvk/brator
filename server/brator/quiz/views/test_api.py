@@ -82,6 +82,18 @@ class FactsListTest(TestCase):
         self.superuser = create_superuser()
         self.client.force_login(self.superuser)
 
+    def test_get_facts_0(self):
+        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 0
+
+    def test_get_facts_1(self):
+        create_numeric_fact()
+        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 1
+
+    def test_get_facts_2(self):
+        create_numeric_fact()
+        create_boolean_fact()
+        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 2
+
     def test_post_fact(self):
         resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
         assert 200 <= resp.status_code <= 399

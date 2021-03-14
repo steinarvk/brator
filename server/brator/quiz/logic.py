@@ -3,6 +3,12 @@ import canonicaljson
 import hashlib
 import logging
 
+import beeline
+
+def traced_function(f):
+    name = f.__name__
+    return beeline.traced(name=name)(f)
+
 from .models import (
     Fact,
     FactType,
@@ -24,25 +30,31 @@ from .exceptions import (
 
 logger = logging.getLogger(__name__)
 
+@traced_function
 def generate_uid():
     return secrets.token_hex(16)
 
+@traced_function
 def select_random_fact():
     return Fact.objects.\
         filter(active=True).\
         order_by("?").\
         first()
 
+@traced_function
 def _save_and_return(x):
     x.save()
     return x
 
+@traced_function
 def create_boolean_challenge(fact):
     return _save_and_return(BooleanChallenge(fact=fact))
 
+@traced_function
 def create_numeric_challenge(fact):
     return _save_and_return(NumericChallenge(fact=fact))
 
+@traced_function
 def create_challenge_from_fact(user, fact):
     creators = {
         "boolean_fact": create_boolean_challenge,
@@ -61,6 +73,7 @@ def create_challenge_from_fact(user, fact):
         **kw,
     ))
 
+@traced_function
 def get_or_create_current_challenge(user):
     challenge = Challenge.objects.filter(
         user = user,
@@ -76,6 +89,7 @@ def get_or_create_current_challenge(user):
 
     return challenge
 
+@traced_function
 def discard_current_challenge(user):
     return Challenge.objects.filter(
         user = user,
@@ -83,6 +97,7 @@ def discard_current_challenge(user):
         response__isnull = True,
     ).update(active = False)
 
+@traced_function
 def respond_to_challenge(user, challenge_uid, response):
     challenge = Challenge.objects.get(user = user, uid = challenge_uid)
 
@@ -117,16 +132,19 @@ def respond_to_challenge(user, challenge_uid, response):
         **{response_field: response_core},
     ))
 
+@traced_function
 def get_last_response(user):
     return Response.objects.filter(
         user = user,
     ).order_by("-creation_time").first()
 
+@traced_function
 def get_user_responses(user, limit):
     return Response.objects.filter(
         user = user,
     ).order_by("creation_time").reverse()[:limit]
 
+@traced_function
 def post_fact(fact_data):
     fact_data = dict(fact_data)
 

@@ -57,7 +57,7 @@ class FactViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
 
     def list(self, request):
-        facts = Fact.objects.all()
+        facts = Fact.objects.select_related("boolean_fact", "numeric_fact").all()
         data = FactFullSerializer(facts, many=True).data
         return Response(data)
 
