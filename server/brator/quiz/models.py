@@ -57,6 +57,14 @@ class Unit(models.TextChoices):
     MINUTES = "minutes"
     SECONDS = "seconds"
     GRAMS = "grams"
+    KILOGRAMS = "kg"
+    HOURS = "hours"
+    KILOGRAMS_E24 = "1E24 kg"
+    MILLIONS_OF_KM = "1E6 km"
+    KM = "km"
+    KM_PER_SECOND = "km/s"
+    METERS_PER_SECOND_SQUARED = "m/s²"
+
 
 class BooleanFact(models.Model):
     question_text = models.TextField()
