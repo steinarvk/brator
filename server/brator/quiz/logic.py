@@ -292,7 +292,7 @@ def maybe_summarize_responses(user, batch_size):
     ]
 
     actual_correct = sum(corr for _, corr in conf_corr)
-    expected_correct = sum(int(corr) * float(conf) for conf, corr in conf_corr)
+    expected_correct = sum(float(conf) for conf, _ in conf_corr)
 
     resp = calculate_plausibility_of(conf_corr)
     assert resp
