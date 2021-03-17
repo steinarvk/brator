@@ -330,8 +330,13 @@ def get_batch_progress(user, batch_size=None):
 def get_largest_standard_summarized_batch_size(user):
     active_batch_sizes = SummaryScore.objects.filter(
         user = user,
-    ).values("batch_size").distinct()
+    ).values_list("batch_size", flat=True).distinct()
+    logger.info("Active batch sizes: %s", repr(active_batch_sizes))
+
     active_std = set(active_batch_sizes) & set(STANDARD_SUMMARY_BATCHES)
+
+    logger.info("Active standard batch sizes (%s): %s", repr(STANDARD_SUMMARY_BATCHES), repr(active_std))
     if not active_std:
         return None
+
     return max(active_std)
