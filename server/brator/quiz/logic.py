@@ -298,6 +298,7 @@ def maybe_summarize_responses(user, batch_size):
     assert resp
 
     rv = SummaryScore.objects.create(
+        user = user,
         batch_size = batch_size,
         actual_correct = actual_correct,
         expected_correct = expected_correct,
@@ -307,3 +308,10 @@ def maybe_summarize_responses(user, batch_size):
     )
     rv.datapoints.set(batch)
     return rv
+
+@traced_function
+def get_last_summary(user, batch_size=None):
+    batch_size = batch_size or STANDARD_SUMMARY_BATCHES[0]
+    return SummaryScore.objects.filter(
+        user = user,
+    ).order_by("-creation_time").first()
