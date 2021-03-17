@@ -11,6 +11,7 @@ from ..logic import (
     respond_to_challenge,
     discard_current_challenge,
     get_last_response,
+    get_last_summary,
 )
 from ..forms import CHALLENGE_FORMS
 from ..exceptions import AlreadyResponded
@@ -34,6 +35,7 @@ def quiz(request):
     formclass = CHALLENGE_FORMS[challenge.challenge_type]
 
     last_response = get_last_response(request.user)
+    last_summary = get_last_summary(request.user)
 
     logger.info("Form class is: %s", formclass)
 
@@ -60,6 +62,7 @@ def quiz(request):
     return render(request, "quiz/challenge.html", {
         "user": request.user,
         "last_response": last_response,
+        "last_summary": last_summary,
         "form": form,
         "challenge": challenge,
     })

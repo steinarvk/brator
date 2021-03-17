@@ -4,10 +4,16 @@
 
 	{% if last_response %}
 
-	<div class="feedback">
+	<div class="last-answer-feedback">
 	{% include "quiz/challenge_core.html" with challenge=last_response.challenge show_answer=True show_response_answer=last_response %}
 	</div>
 
+	{% endif %}
+
+	{% if last_summary %}
+	<div class="last-summary-feedback">
+		{% include "quiz/summary.html" with summary=last_summary %}
+	</div>
 	{% endif %}
 
 	<div class="challenge">
