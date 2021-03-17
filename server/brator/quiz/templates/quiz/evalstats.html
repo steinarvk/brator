@@ -14,6 +14,22 @@
 		<tr>
 			<td>Expected correct answers
 			<td>{{ stats.expected_correct_answers }}
+
+		{% if stats.plausibility %}
+		{% with p=stats.plausibility k=stats.number_of_correct_answers %}
+		<tr>
+			<td>P(correct &lt; {{ k }} | calibrated)
+			<td>{{ p.prob_fewer }}
+
+		<tr>
+			<td>P(correct = {{ k }} | calibrated)
+			<td>{{ p.prob_same }}
+
+		<tr>
+			<td>P(correct &gt; {{ k }} | calibrated)
+			<td>{{ p.prob_more }}
+		{% endwith %}
+		{% endif %}
 	</table>
 	{% else %}
 	No data.

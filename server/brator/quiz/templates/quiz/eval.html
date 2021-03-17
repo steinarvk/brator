@@ -5,4 +5,6 @@
 {% block content %}
   {% include "quiz/evalstats.html" with stats=stats.total header='Overall' %}
   {% include "quiz/evalstats.html" with stats=stats.24h header='Last 24h' %}
+  {% include "quiz/evalstats.html" with stats=stats.last50 header='Last 50' %}
+  {% include "quiz/evalstats.html" with stats=stats.last10 header='Last 10' %}
 {% endblock %}

@@ -25,6 +25,10 @@ from .models import (
     FACT_MODELS,
 )
 
+from .stats import (
+    calculate_plausibility_of,
+)
+
 from .exceptions import (
     BadRequest,
     AlreadyResponded,
@@ -220,18 +224,27 @@ def post_fact(fact_data):
         **{field_name: core},
     )
 
-
-def get_eval_stats_for_scope(user, **kwargs):
+@traced_function
+def get_eval_stats_for_scope(user, limit=None, **kwargs):
     qs = Response.objects.filter(user=user, **kwargs)
-    objs = list(qs.all())
-    correct = [o for o in objs if o.correct]
-    expected = sum([o.confidence_percent/100 for o in objs])
+    if limit is None:
+        objs = list(qs.all())
+    else:
+        objs = qs.order_by("-creation_time")[:limit]
+    correct = [o.correct for o in objs]
+    confidences = [o.confidence_percent/100 for o in objs]
+    assert len(correct) == len(confidences)
+    expected = sum(confidences)
+    confidence_correctness = list(zip(confidences, correct))
+    plausibility = calculate_plausibility_of(confidence_correctness)
     return {
         "number_of_answers": len(objs),
-        "number_of_correct_answers": len(correct),
+        "number_of_correct_answers": sum(correct),
         "expected_correct_answers": expected,
+        "plausibility": plausibility,
     }
 
+@traced_function
 def get_eval_stats(user):
     now = datetime.datetime.now()
     cutoff_24h = now - datetime.timedelta(hours=24)
@@ -239,6 +252,8 @@ def get_eval_stats(user):
         "stats": {
             "total": get_eval_stats_for_scope(user),
             "24h": get_eval_stats_for_scope(user, creation_time__gte=cutoff_24h),
+            "last50": get_eval_stats_for_scope(user, limit=50),
+            "last10": get_eval_stats_for_scope(user, limit=10),
         },
     }
     logger.info("Returning evaluation stats: %s", repr(rv))
