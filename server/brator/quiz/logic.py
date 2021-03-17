@@ -7,7 +7,7 @@ import random
 
 import beeline
 
-STANDARD_SUMMARY_BATCHES = [20]
+STANDARD_SUMMARY_BATCHES = [20, 50]
 
 def traced_function(f):
     name = f.__name__
@@ -268,16 +268,19 @@ def get_eval_stats(user):
     return rv
 
 @traced_function
-def get_summarizable_responses(user, batch_size):
-    qs = Response.objects.filter(
+def get_summarizable_responses_qs(user, batch_size):
+    return Response.objects.filter(
         user = user,
         resolved = True,
     ).exclude(
         summary_scores__batch_size = batch_size,
-    )
+    ).order_by("creation_time")
+
+@traced_function
+def get_summarizable_responses(user, batch_size):
+    qs = get_summarizable_responses_qs(user, batch_size)
     if qs.count() < batch_size:
         return None
-    qs = qs.order_by("creation_time")
     return qs[:batch_size]
 
 @traced_function
@@ -315,3 +318,20 @@ def get_last_summary(user, batch_size=None):
     return SummaryScore.objects.filter(
         user = user,
     ).order_by("-creation_time").first()
+
+@traced_function
+def get_batch_progress(user, batch_size=None):
+    batch_size = batch_size or STANDARD_SUMMARY_BATCHES[0]
+    qs = get_summarizable_responses_qs(user, batch_size)
+    achieved = min(batch_size, qs.count())
+    return achieved, batch_size
+
+@traced_function
+def get_largest_standard_summarized_batch_size(user):
+    active_batch_sizes = SummaryScore.objects.filter(
+        user = user,
+    ).values("batch_size").distinct()
+    active_std = set(active_batch_sizes) & set(STANDARD_SUMMARY_BATCHES)
+    if not active_std:
+        return None
+    return max(active_std)

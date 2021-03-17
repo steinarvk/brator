@@ -12,6 +12,8 @@ from ..logic import (
     discard_current_challenge,
     get_last_response,
     get_last_summary,
+    get_batch_progress,
+    get_largest_standard_summarized_batch_size,
 )
 from ..forms import CHALLENGE_FORMS
 from ..exceptions import AlreadyResponded
@@ -35,7 +37,10 @@ def quiz(request):
     formclass = CHALLENGE_FORMS[challenge.challenge_type]
 
     last_response = get_last_response(request.user)
-    last_summary = get_last_summary(request.user)
+
+    batch_size = get_largest_standard_summarized_batch_size(request.user)
+    last_summary = get_last_summary(request.user, batch_size)
+    batch_progress, _ = get_batch_progress(request.user, batch_size)
 
     logger.info("Form class is: %s", formclass)
 
@@ -63,6 +68,10 @@ def quiz(request):
         "user": request.user,
         "last_response": last_response,
         "last_summary": last_summary,
+        "summary_progress": {
+            "progress": batch_progress,
+            "batch_size": batch_size,
+        },
         "form": form,
         "challenge": challenge,
     })
