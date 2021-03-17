@@ -7,6 +7,8 @@ import random
 
 import beeline
 
+STANDARD_SUMMARY_BATCHES = [20]
+
 def traced_function(f):
     name = f.__name__
     return beeline.traced(name=name)(f)
@@ -21,6 +23,7 @@ from .models import (
     BooleanResponse,
     NumericResponse,
     Response,
+    SummaryScore,
     RESPONSE_MODELS,
     FACT_MODELS,
 )
@@ -149,7 +152,7 @@ def respond_to_challenge(user, challenge_uid, response):
 
     is_correct = response_core.get_correctness()
 
-    return _save_and_return(Response(
+    rv = _save_and_return(Response(
         user = user,
         challenge = challenge,
         confidence_percent = confidence,
@@ -157,6 +160,11 @@ def respond_to_challenge(user, challenge_uid, response):
         response_type = k,
         **{response_field: response_core},
     ))
+
+    for batch_size in STANDARD_SUMMARY_BATCHES:
+        maybe_summarize_responses(user, batch_size)
+
+    return rv
 
 @traced_function
 def get_last_response(user):
@@ -272,3 +280,30 @@ def get_summarizable_responses(user, batch_size):
     qs = qs.order_by("creation_time")
     return qs[:batch_size]
 
+@traced_function
+def maybe_summarize_responses(user, batch_size):
+    batch = get_summarizable_responses(user, batch_size)
+    if not batch:
+        return None
+
+    conf_corr = [
+        (float(x.confidence_percent/100), x.correct)
+        for x in batch
+    ]
+
+    actual_correct = sum(corr for _, corr in conf_corr)
+    expected_correct = sum(int(corr) * float(conf) for conf, corr in conf_corr)
+
+    resp = calculate_plausibility_of(conf_corr)
+    assert resp
+
+    rv = SummaryScore.objects.create(
+        batch_size = batch_size,
+        actual_correct = actual_correct,
+        expected_correct = expected_correct,
+        probability_fewer_correct = resp["prob_fewer"],
+        probability_same_correct = resp["prob_same"],
+        probability_more_correct = resp["prob_more"],
+    )
+    rv.datapoints.set(batch)
+    return rv
