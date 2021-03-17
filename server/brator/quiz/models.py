@@ -196,6 +196,8 @@ class Response(models.Model):
     confidence_percent = ConfidenceField()
     correct = models.BooleanField()
 
+    resolved = models.BooleanField(default=True)
+
     response_type = TagField(FactType)
 
     boolean_response = models.ForeignKey(BooleanResponse, on_delete=models.CASCADE, null=True, blank=True)
@@ -203,6 +205,19 @@ class Response(models.Model):
 
     def clean(self):
         _validate_tagged_union(self, FactType, "response_type", "_response")
+
+class SummaryScore(models.Model):
+    creation_time = models.DateTimeField(auto_now_add=True)
+    batch_size = models.IntegerField()
+
+    datapoints = models.ManyToManyField(Response, related_name="summary_scores")
+
+    actual_correct = models.IntegerField()
+    expected_correct = models.DecimalField(max_digits=8, decimal_places=4)
+
+    probability_fewer_correct = models.DecimalField(max_digits=9, decimal_places=8)
+    probability_same_correct = models.DecimalField(max_digits=9, decimal_places=8)
+    probability_more_correct = models.DecimalField(max_digits=9, decimal_places=8)
 
 def _register_models(maybe_models: List[Any]):
     for model in maybe_models:

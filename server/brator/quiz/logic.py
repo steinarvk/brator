@@ -259,3 +259,16 @@ def get_eval_stats(user):
     logger.info("Returning evaluation stats: %s", repr(rv))
     return rv
 
+@traced_function
+def get_summarizable_responses(user, batch_size):
+    qs = Response.filter(
+        user = user,
+        resolved = True,
+    ).exclude(
+        summary_scores__batch_size = batch_size,
+    )
+    if qs.count() < batch_size:
+        return None
+    qs = qs.order_by("creation_time")
+    return qs[:batch_size]
+
