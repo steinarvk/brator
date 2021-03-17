@@ -261,7 +261,7 @@ def get_eval_stats(user):
 
 @traced_function
 def get_summarizable_responses(user, batch_size):
-    qs = Response.filter(
+    qs = Response.objects.filter(
         user = user,
         resolved = True,
     ).exclude(
