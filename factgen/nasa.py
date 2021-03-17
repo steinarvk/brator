@@ -48,7 +48,7 @@ def get_diameter_facts():
             "key": f"nasa-planet-diameter-{planet.lower()}",
             "category": "nasa-planet-diameter",
             "numeric": {
-                "question_text": f"What's the equatorial diameter of {planet}?",
+                "question_text": f"What's the equatorial diameter of {planet}, in kilometers?",
                 "correct_answer": value,
                 "correct_answer_unit": "km",
             },
@@ -124,7 +124,7 @@ def get_length_of_day_facts():
             "key": f"nasa-planet-lengthofday-{planet.lower()}",
             "category": "nasa-planet-lengthofday",
             "numeric": {
-                "question_text": f"What's the length of a day on {planet}, in hours?",
+                "question_text": f"What's the length of a solar day on {planet}, in hours?",
                 "correct_answer": value,
                 "correct_answer_unit": "hours",
             },
