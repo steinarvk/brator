@@ -209,6 +209,7 @@ class Response(models.Model):
 class SummaryScore(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     batch_size = models.IntegerField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
 
     datapoints = models.ManyToManyField(Response, related_name="summary_scores")
 
