@@ -77,6 +77,7 @@ DATABASES = {
         "HOST": os.environ.get("BRATOR_DB_HOST", "localhost"),
         "PORT": os.environ.get("BRATOR_DB_PORT", "5432"),
         "PASSWORD": os.environ.get("BRATOR_DB_PASSWORD"),
+        "ATOMIC_REQUESTS": True,
     }
 }
 
