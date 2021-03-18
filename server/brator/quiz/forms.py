@@ -47,6 +47,17 @@ class ChallengeFeedbackForm(forms.Form):
     category = forms.ChoiceField(choices=FeedbackType.choices)
     text = forms.CharField(max_length=4 * 1024, widget=forms.Textarea)
 
+class DeleteMyAccountForm(forms.Form):
+    desired_confirmation_message = "Delete my account. I understand that this action is irreversible."
+    confirmation_message = forms.CharField(max_length=128)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data["confirmation_message"] != self.desired_confirmation_message:
+            raise ValidationError(f"Confirmation message must be exactly {repr(self.desired_confirmation_message)}.")
+
+        return cleaned_data
 
 CHALLENGE_FORMS = {
     "boolean": BooleanResponseForm,

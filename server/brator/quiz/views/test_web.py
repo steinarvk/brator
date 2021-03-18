@@ -112,3 +112,27 @@ class FeedbackTest(TestCase):
         assert resp.status_code == 302
         assert ChallengeFeedback.objects.count() == 1
 
+class AccountSettingsTest(TestCase):
+    def setUp(self):
+        self.client.force_login(create_regular_user())
+
+    def test_delete_account(self):
+        resp = self.client.get(reverse("quiz:web-account"))
+        assert resp.status_code == 200
+
+class DeleteMyAccountTest(TestCase):
+    def setUp(self):
+        self.client.force_login(create_regular_user())
+        create_custom_numeric_fact(
+            "How many roads must a man walk down?",
+            4212345
+        )
+        self.client.get(reverse("quiz:web-quiz"))
+        self.challenge = Challenge.objects.get()
+
+    def test_delete_account(self):
+        assert Challenge.objects.count() == 1
+        resp = self.client.post(reverse("quiz:web-deleteaccount"), {
+            "confirmation_message": "Delete my account. I understand that this action is irreversible.",
+        })
+        assert Challenge.objects.count() == 0

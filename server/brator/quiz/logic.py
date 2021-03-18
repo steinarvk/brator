@@ -344,3 +344,7 @@ def get_largest_standard_summarized_batch_size(user):
 @traced_function
 def get_challenge_by_uid(user, uid):
     return Challenge.objects.get(user = user, uid = uid)
+
+@traced_function
+def delete_user_account(user):
+    user.delete()

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+    Deleting your account is instant and irreversible.
+    </p>
+
+    <p>
+    Your entire history will be deleted, including
+    your answered questions, your evaluation scores,
+    all the feedback you've given and any other record
+    of your activities on the site.
+    </p>
+
+    <p>
+    To delete your account, write
+    <pre>{{ confirmation_message }}</pre>
+    into the text box below to confirm that you
+    understand this, and then press
+    "Delete my account".
+    </p>
+
+    <table>
+	    {{ form.as_table }}
+    </table>
+
+    <input type="submit" value="Delete my account">
+</form>
+
+{% endblock %}

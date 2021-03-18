@@ -15,10 +15,11 @@ from ..logic import (
     get_last_summary,
     get_batch_progress,
     get_largest_standard_summarized_batch_size,
+    delete_user_account,
 )
 from ..models import ChallengeFeedback
 from ..forms import CHALLENGE_FORMS
-from ..forms import ChallengeFeedbackForm
+from ..forms import ChallengeFeedbackForm, DeleteMyAccountForm
 from ..exceptions import AlreadyResponded
 
 logger = logging.getLogger(__name__)
@@ -119,3 +120,22 @@ def eval_results(request):
     context = get_eval_stats(request.user)
     context["user"] = request.user
     return render(request, "quiz/eval.html", context)
+
+@login_required
+def account_settings(request):
+    return render(request, "quiz/account.html", {})
+
+@login_required
+def delete_account(request):
+    if request.method == "POST":
+        form = DeleteMyAccountForm(request.POST)
+
+        if form.is_valid():
+            delete_user_account(request.user)
+    else:
+        form = DeleteMyAccountForm()
+
+    return render(request, "quiz/deleteme.html", {
+        "confirmation_message": DeleteMyAccountForm.desired_confirmation_message,
+        "form": form,
+    })
