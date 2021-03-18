@@ -1,7 +1,19 @@
 <!DOCTYPE html>
+
+{% load compress %}
+{% load static %}
+
 <html lang="en">
+
 <head>
     <title>Brator{% block titlesuffix %}{% endblock %}</title>
+
+    {% compress css %}
+    	<link type="text/x-scss"
+	      href="{% static 'quiz.scss' %}"
+	      rel="stylesheet"
+	      media="screen">
+    {% endcompress %}
 </head>
 
 <body>

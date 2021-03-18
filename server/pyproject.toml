@@ -17,6 +17,8 @@ httptools = "^0.1.1"
 whitenoise = "^5.2.0"
 honeycomb-beeline = "^2.16.2"
 canonicaljson = "^1.4.0"
+django-compressor = "^2.4"
+django-libsass = "^0.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

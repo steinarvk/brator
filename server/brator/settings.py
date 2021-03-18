@@ -24,6 +24,7 @@ ALLOWED_HOSTS = list(x for x in os.environ.get("BRATOR_ALLOWED_HOSTS", "").split
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
+    "compressor",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,6 +136,11 @@ REST_FRAMEWORK = {
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
 
 HONEYCOMB_API_KEY = os.environ.get("BRATOR_HONEYCOMB_API_KEY")
 HONEYCOMB_DATASET = os.environ.get("BRATOR_HONEYCOMB_DATASET", ENVIRONMENT)
@@ -155,3 +161,8 @@ LOGGING = {
 }
 
 LOGIN_REDIRECT_URL = "/"
+
+COMPRESS_PRECOMPILERS = [
+    ["text/x-scss", "django_libsass.SassCompiler"],
+]
+COMPRESS_ENABLED = True

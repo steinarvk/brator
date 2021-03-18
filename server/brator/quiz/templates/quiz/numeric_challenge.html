@@ -1,4 +1,5 @@
 {% extends "quiz/challenge_base.html" %}
+{% load numberformat %}
 
 {% block question %}
 	{{ challenge.fact.question_text }}
@@ -8,10 +9,12 @@
 {% block useranswer %}
 	{% with low=show_response_answer.numeric_response.ci_low high=show_response_answer.numeric_response.ci_high %}
 		{% if low == high %}
-			exactly {{ low }}
+			exactly {% format_number low %}
 		{% else %}
-			{{ low }} to {{ high }}
-			({{ show_response_answer.confidence_percent }}% CI)
+			{% format_number low %}
+			to
+			{% format_number high %}
+			({% format_percent show_response_answer.confidence_percent %} CI)
 		{% endif %}
 	{% endwith %}
 {% endblock %}
@@ -19,6 +22,6 @@
 
 {% if show_answer %}
 {% block correctanswer %}
-	{{ challenge.fact.correct_answer }}
+	{% format_number challenge.fact.correct_answer %}
 {% endblock %}
 {% endif %}

@@ -1,3 +1,8 @@
+{% load numberformat %}
+
+<details>
+<summary>How am I doing?</summary>
+
 <p>Last batch of {{ summary.batch_size }} answers
 (next batch: {{ summary_progress.progress }}/{{ summary_progress.batch_size }}):
 
@@ -11,17 +16,18 @@ Assuming correct calibration:
 <ul>
 
 <li>
-P={{ summary.probability_fewer_correct }} of fewer correct
+P={% format_probability summary.probability_fewer_correct %} of fewer correct
 answers. A high probability indicates you have too many
 correct answers, and should use narrower confidence
 intervals or higher confidences when you answer.
 
 <li>
-P={{ summary.probability_more_correct }} of more correct
+P={% format_probability summary.probability_more_correct %} of more correct
 answers. A high probability indicates you have too
 few correct answers, and should use broader confidence
 intervals or lower confidence when you answer.
 
 </ul>
-
 </p>
+
+</details>

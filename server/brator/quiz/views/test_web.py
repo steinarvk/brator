@@ -31,7 +31,7 @@ class ChallengeTest(TestCase):
         resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
-        assert b"4212345" not in resp.content
+        assert b"4 212 345" not in resp.content
 
 
     def test_get_a_question_and_answer_it(self):
@@ -42,7 +42,7 @@ class ChallengeTest(TestCase):
         resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
-        assert b"4212345" not in resp.content
+        assert b"4 212 345" not in resp.content
 
         challenge = Challenge.objects.first()
 
@@ -56,7 +56,7 @@ class ChallengeTest(TestCase):
         resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
-        assert b"4212345" in resp.content
+        assert b"4 212 345" in resp.content
         assert b"Correct" in resp.content
 
     def test_get_a_question_and_answer_it_incorrectly(self):
@@ -67,7 +67,7 @@ class ChallengeTest(TestCase):
         resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
-        assert b"4212345" not in resp.content
+        assert b"4 212 345" not in resp.content
 
         challenge = Challenge.objects.first()
 
@@ -81,7 +81,7 @@ class ChallengeTest(TestCase):
         resp = self.client.get(reverse("quiz:web-quiz"))
         assert resp.status_code == 200
         assert b"How many roads" in resp.content
-        assert b"4212345" in resp.content
+        assert b"4 212 345" in resp.content
         assert b"Incorrect" in resp.content
 
 class EvalTest(TestCase):
