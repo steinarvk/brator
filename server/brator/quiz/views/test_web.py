@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from ..testutils import create_regular_user, create_fact, create_custom_numeric_fact
 
-from ..models import Challenge
+from ..models import Challenge, ChallengeFeedback
 
 class IndexTest(TestCase):
     def setUp(self):
@@ -91,4 +91,24 @@ class EvalTest(TestCase):
     def test_index(self):
         resp = self.client.get(reverse("quiz:web-eval"))
         assert resp.status_code == 200
+
+class FeedbackTest(TestCase):
+    def setUp(self):
+        self.client.force_login(create_regular_user())
+        create_custom_numeric_fact(
+            "How many roads must a man walk down?",
+            4212345
+        )
+        self.client.get(reverse("quiz:web-quiz"))
+        self.challenge = Challenge.objects.get()
+
+    def test_feedback(self):
+        assert ChallengeFeedback.objects.count() == 0
+        resp = self.client.post(reverse("quiz:web-feedback"), {
+            "challenge_uid": self.challenge.uid,
+            "category": "wrong",
+            "text": "Answer should be 42",
+        })
+        assert resp.status_code == 302
+        assert ChallengeFeedback.objects.count() == 1
 

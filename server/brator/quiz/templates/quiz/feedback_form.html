@@ -1,0 +1,10 @@
+<form method="post" action="{% url 'quiz:web-feedback' %}" >
+    {% csrf_token %}
+    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
+
+    <table>
+	    {{ feedback_form.as_table }}
+    </table>
+
+    <input type="submit" value="Post feedback">
+</form>

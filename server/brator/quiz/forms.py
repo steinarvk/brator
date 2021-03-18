@@ -1,5 +1,7 @@
 import decimal
 
+from .models import ChallengeFeedback, FeedbackType
+
 from django import forms
 from django.forms.widgets import NumberInput
 from django.core.exceptions import ValidationError
@@ -39,6 +41,12 @@ class NumericResponseForm(forms.Form):
         cleaned_data["confidence_percent"] = 90
         
         return cleaned_data
+
+class ChallengeFeedbackForm(forms.Form):
+    challenge_uid = forms.CharField(max_length=32, widget=forms.HiddenInput())
+    category = forms.ChoiceField(choices=FeedbackType.choices)
+    text = forms.CharField(max_length=4 * 1024, widget=forms.Textarea)
+
 
 CHALLENGE_FORMS = {
     "boolean": BooleanResponseForm,

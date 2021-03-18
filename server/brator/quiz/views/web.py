@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from ..logic import (
     get_or_create_current_challenge,
     get_eval_stats,
+    get_challenge_by_uid,
     respond_to_challenge,
     discard_current_challenge,
     get_last_response,
@@ -15,7 +16,9 @@ from ..logic import (
     get_batch_progress,
     get_largest_standard_summarized_batch_size,
 )
+from ..models import ChallengeFeedback
 from ..forms import CHALLENGE_FORMS
+from ..forms import ChallengeFeedbackForm
 from ..exceptions import AlreadyResponded
 
 logger = logging.getLogger(__name__)
@@ -74,7 +77,42 @@ def quiz(request):
         },
         "form": form,
         "challenge": challenge,
+        "feedback_form": ChallengeFeedbackForm(initial={
+            "challenge_uid": challenge.uid,
+        }),
     })
+
+@login_required
+def feedback(request):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+
+    logger.info("Incoming POST data: %s", repr(request.POST))
+    form = ChallengeFeedbackForm(request.POST or None)
+
+    if form.is_valid():
+        uid = form.cleaned_data["challenge_uid"]
+
+        challenge = get_challenge_by_uid(request.user, uid)
+
+        if challenge.user != request.user:
+            return HttpResponse(status=401)
+
+        form_data = form.cleaned_data
+
+        ChallengeFeedback.objects.create(
+            user = request.user,
+            challenge = challenge,
+            category = form_data["category"],
+            text = form_data["text"],
+        )
+
+        return redirect(reverse("quiz:web-quiz"))
+
+    return render(request, "quiz/standalone_feedback_form.html", {
+        "feedback_form": form,
+    })
+
 
 @login_required
 def eval_results(request):

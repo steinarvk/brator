@@ -340,3 +340,7 @@ def get_largest_standard_summarized_batch_size(user):
         return None
 
     return max(active_std)
+
+@traced_function
+def get_challenge_by_uid(user, uid):
+    return Challenge.objects.get(user = user, uid = uid)
