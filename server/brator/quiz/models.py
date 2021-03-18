@@ -220,6 +220,27 @@ class SummaryScore(models.Model):
     probability_same_correct = models.DecimalField(max_digits=9, decimal_places=8)
     probability_more_correct = models.DecimalField(max_digits=9, decimal_places=8)
 
+class FeedbackType(models.TextChoices):
+    WRONG = "wrong", "Provided answer is wrong"
+    NONSENSE = "nonsense", "Question is incomprehensible"
+    AMBIGUOUS = "ambiguous", "Question is ambiguous"
+    TYPO = "typo", "Bad grammar/spelling"
+    BORING = "boring", "Question is not interesting"
+    TOO_EASY = "too-easy", "Question is too easy"
+    TOO_HARD = "too-hard", "Question is too hard"
+    OTHER = "other", "Other"
+
+class ChallengeFeedback(models.Model):
+    creation_time = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    category = models.CharField(max_length=32, choices = FeedbackType.choices)
+    text = models.TextField()
+
+    def clean(self):
+        if self.user != self.challenge.user:
+            raise ValidationError(f"Feedback for a different user's challenge")
+
 def _register_models(maybe_models: List[Any]):
     for model in maybe_models:
         if not inspect.isclass(model):
