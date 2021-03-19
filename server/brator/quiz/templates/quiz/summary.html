@@ -1,33 +1,61 @@
 {% load numberformat %}
 
-<details>
-<summary>How am I doing?</summary>
-
-<p>Last batch of {{ summary.batch_size }} answers
-(next batch: {{ summary_progress.progress }}/{{ summary_progress.batch_size }}):
-
-{{ summary.actual_correct }} correct answers;
-{{ summary.expected_correct }} expected correct answers.
-</p>
-
 <p>
-Assuming correct calibration: 
-
-<ul>
-
-<li>
-P={% format_probability summary.probability_fewer_correct %} of fewer correct
-answers. A high probability indicates you have too many
-correct answers, and should use narrower confidence
-intervals or higher confidences when you answer.
-
-<li>
-P={% format_probability summary.probability_more_correct %} of more correct
-answers. A high probability indicates you have too
-few correct answers, and should use broader confidence
-intervals or lower confidence when you answer.
-
-</ul>
+	In the last completed batch, you had
+	{{ summary.actual_correct }}/{{ summary.batch_size }} correct answers.
+	Based on your confidence,
+	{{ summary.expected_correct }} correct answers were expected.
 </p>
 
-</details>
+{% if summary.probability_fewer_correct > 0.75 %}
+<div class="notification is-warning">
+	<p>
+		<b>You were probably underconfident.</b>
+	</p>
+
+	<p>
+		If your confidence estimates were accurate, there would be a
+		{% format_probability_as_percent summary.probability_fewer_correct %}
+		chance of getting fewer than {{ summary.actual_correct }} correct answers.
+	</p>
+
+	<p>
+		Narrow your confidence intervals and increase your confidence in
+		your predictions.
+	</p>
+</div>
+{% elif summary.probability_more_correct > 0.75 %}
+<div class="notification is-warning">
+	<p>
+		<b>You were probably overconfident.</b>
+	</p>
+
+	<p>
+		If your confidence estimates were accurate, there would be a
+		{% format_probability_as_percent summary.probability_more_correct %}
+		chance of getting more than {{ summary.actual_correct }} correct answers.
+	</p>
+
+	<p>
+		Broaden your confidence intervals and decrease your confidence in your predictions.
+	</p>
+</div>
+{% endif %}
+
+<div class="columns is-vcentered">
+	<div class="column is-one-quarter">
+		Next batch
+	</div>
+
+	<div class="column is-three-quarters">
+		<progress class="progress is-info"
+			  value="{{ summary_progress.progress }}"
+			  max="{{ summary_progress.batch_size }}"
+			  >
+		{{ summary_progress.progress }}/{{ summary_progress.batch_size }}
+		</progress>
+	</div>
+</div>
+
+
+</div>

@@ -8,6 +8,8 @@
 {% if show_response_answer %}
 {% block useranswer %}
 	{{ show_response_answer.boolean_response.answer }}
+
+	({% format_percent show_response_answer.confidence_percent %} confidence)
 {% endblock %}
 {% endif %}
 

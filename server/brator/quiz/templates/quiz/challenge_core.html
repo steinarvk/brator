@@ -1,5 +1,8 @@
 {% load numberformat %}
 
+<div class="columns is-vcentered">
+<div class="column is-three-quarters">
+
 {% if challenge.boolean_challenge %}
 	{% include "quiz/boolean_challenge.html" with challenge=challenge.boolean_challenge %}
 {% elif challenge.numeric_challenge %}
@@ -10,24 +13,18 @@
 	</div>
 {% endif %}
 
-{% if show_response_answer %}
-<div>
-	Your confidence: {% format_percent show_response_answer.confidence_percent %}
 </div>
+<div class="column is-one-quarter">
 
-<div>
-	Status:
-
-	{% if show_response_answer.correct %}
-		Correct
-	{% else %}
-		Incorrect
-	{% endif %}
-</div>
+{% if show_answer %}
+	<a href="{% url 'quiz:web-report-answer' challenge.uid %}" class="button is-small is-danger is-rounded">
+	Bad question?
+	</a>
+{% else %}
+	<a href="{% url 'quiz:web-report-question' challenge.uid %}" class="button is-small is-danger is-rounded">
+	Bad question?
+	</a>
 {% endif %}
 
-<details>
-	<summary>Bad question?</summary>
-
-	{% include "quiz/feedback_form.html" %}
-</details>
+</div>
+</div>

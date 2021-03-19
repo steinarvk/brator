@@ -102,10 +102,18 @@ class FeedbackTest(TestCase):
         self.client.get(reverse("quiz:web-quiz"))
         self.challenge = Challenge.objects.get()
 
-    def test_feedback(self):
+    def test_answer_feedback(self):
         assert ChallengeFeedback.objects.count() == 0
-        resp = self.client.post(reverse("quiz:web-feedback"), {
-            "challenge_uid": self.challenge.uid,
+        resp = self.client.post(reverse("quiz:web-report-answer", args=[self.challenge.uid]), {
+            "category": "wrong",
+            "text": "Answer should be 42",
+        })
+        assert resp.status_code == 302
+        assert ChallengeFeedback.objects.count() == 1
+
+    def test_question_feedback(self):
+        assert ChallengeFeedback.objects.count() == 0
+        resp = self.client.post(reverse("quiz:web-report-question", args=[self.challenge.uid]), {
             "category": "wrong",
             "text": "Answer should be 42",
         })

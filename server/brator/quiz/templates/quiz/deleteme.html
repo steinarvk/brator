@@ -24,11 +24,18 @@
     "Delete my account".
     </p>
 
-    <table>
-	    {{ form.as_table }}
-    </table>
+    {{ form.non_field_errors }}
 
-    <input type="submit" value="Delete my account">
+    <div class="field">
+	    {{ form.confirmation_message.errors }}
+
+	    <label class="label">Confirm:</label>
+	    <div class="control">
+		    {{ form.confirmation_message }}
+	    </div>
+    </div>
+
+    <input type="submit" class="button is-danger" value="Delete my account">
 </form>
 
 {% endblock %}

@@ -10,6 +10,7 @@
 	{% with low=show_response_answer.numeric_response.ci_low high=show_response_answer.numeric_response.ci_high %}
 		{% if low == high %}
 			exactly {% format_number low %}
+			({% format_percent show_response_answer.confidence_percent %} confidence)
 		{% else %}
 			{% format_number low %}
 			to

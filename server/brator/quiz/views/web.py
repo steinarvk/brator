@@ -84,21 +84,12 @@ def quiz(request):
     })
 
 @login_required
-def feedback(request):
-    if request.method != "POST":
-        return HttpResponse(status=405)
+def question_feedback(request, uid):
+    challenge = get_challenge_by_uid(request.user, uid)
 
-    logger.info("Incoming POST data: %s", repr(request.POST))
     form = ChallengeFeedbackForm(request.POST or None)
 
     if form.is_valid():
-        uid = form.cleaned_data["challenge_uid"]
-
-        challenge = get_challenge_by_uid(request.user, uid)
-
-        if challenge.user != request.user:
-            return HttpResponse(status=401)
-
         form_data = form.cleaned_data
 
         ChallengeFeedback.objects.create(
@@ -111,6 +102,31 @@ def feedback(request):
         return redirect(reverse("quiz:web-quiz"))
 
     return render(request, "quiz/standalone_feedback_form.html", {
+        "challenge": challenge,
+        "feedback_form": form,
+    })
+
+@login_required
+def answer_feedback(request, uid):
+    challenge = get_challenge_by_uid(request.user, uid)
+
+    form = ChallengeFeedbackForm(request.POST or None)
+
+    if form.is_valid():
+        form_data = form.cleaned_data
+
+        ChallengeFeedback.objects.create(
+            user = request.user,
+            challenge = challenge,
+            category = form_data["category"],
+            text = form_data["text"],
+        )
+
+        return redirect(reverse("quiz:web-quiz"))
+
+    return render(request, "quiz/standalone_feedback_form_with_answer.html", {
+        "show_answer": True,
+        "challenge": challenge,
         "feedback_form": form,
     })
 

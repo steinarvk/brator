@@ -2,43 +2,61 @@
 
 {% block content %}
 
-	{% if last_response %}
+<div class="block card">
+	<div class="card-header">
+		<p class="card-header-title">
+		Question
+		</p>
+	</div>
+	<div class="card-content">
+		{% include "quiz/challenge_core.html" with challenge=challenge %}
 
-	<div class="last-answer-feedback">
+		<form method="post">
+		    {% csrf_token %}
+
+		    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
+
+		    <table>
+			    {{ form.as_table }}
+		    </table>
+
+		    <input type="submit" value="Submit answer" class="button is-primary">
+		</form>
+
+		<form method="post" action="{% url 'quiz:web-skip' %}" >
+		    {% csrf_token %}
+		    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
+		    <input type="submit" value="Skip question" class="button is-danger">
+		</form>
+	</div>
+</div>
+
+{% if last_response %}
+<div class="block card">
+	<div class="card-header">
+		<p class="card-header-title">
+		Last answer
+		</p>
+	</div>
+	<div class="card-content">
 	{% include "quiz/challenge_core.html" with challenge=last_response.challenge show_answer=True show_response_answer=last_response %}
 	</div>
+</div>
+{% endif %}
 
-	{% endif %}
+{% if last_summary %}
+<div class="block card">
+	<div class="card-header">
+		<p class="card-header-title">
+		How am I doing?
+		</p>
+	</div>
 
-	{% if last_summary %}
-	<div class="last-summary-feedback">
+	<div class="card-content">
 		{% include "quiz/summary.html" with summary=last_summary %}
 	</div>
-	{% endif %}
+</div>
+{% endif %}
 
-	<div class="challenge">
-	<h1>Question</h1>
-
-	{% include "quiz/challenge_core.html" with challenge=challenge %}
-
-	<form method="post">
-	    {% csrf_token %}
-
-	    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
-
-	    <table>
-		    {{ form.as_table }}
-	    </table>
-
-	    <input type="submit" value="Submit answer">
-	</form>
-
-	<form method="post" action="{% url 'quiz:web-skip' %}" >
-	    {% csrf_token %}
-	    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
-	    <input type="submit" value="Skip question">
-	</form>
-
-	</div>
 {% endblock %}
 

@@ -1,16 +1,8 @@
 <div class="question">
 	{% block question %}
 	{% endblock %}
-</div>
 
-{% if show_response_answer %}
-<div class="user-answer">
-	Response:
-
-	{% block useranswer %}
-	{% endblock %}
 </div>
-{% endif %}
 
 {% if show_answer %}
 <div class="correct-answer">
@@ -20,3 +12,21 @@
 	{% endblock %}
 </div>
 {% endif %}
+
+{% if show_response_answer %}
+<div class="user-answer">
+	Response:
+
+	{% block useranswer %}
+	{% endblock %}
+
+	{% if show_response_answer %}
+		{% if show_response_answer.correct %}
+		<span class="tag is-success">Correct</span>
+		{% else %}
+		<span class="tag is-danger">Incorrect</span>
+		{% endif %}
+	{% endif %}
+</div>
+{% endif %}
+

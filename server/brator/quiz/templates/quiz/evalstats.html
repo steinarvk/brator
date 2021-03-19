@@ -1,10 +1,12 @@
-<div class="stats">
-	{% if header %}
-	  <h1>{{ header }}</h1>
-	{% endif %}
+<div class="panel">
+	<p class="panel-heading is-primary">
+	  {{ header }}
+	</p>
+	
+	<div class="panel-block">
 
 	{% if stats.number_of_answers %}
-	<table>
+	<table class="table">
 		<tr>
 			<td>Questions answered
 			<td>{{ stats.number_of_answers }}
@@ -34,4 +36,6 @@
 	{% else %}
 	No data.
 	{% endif %}
+
+	</div>
 </div>

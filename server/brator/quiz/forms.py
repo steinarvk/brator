@@ -43,7 +43,6 @@ class NumericResponseForm(forms.Form):
         return cleaned_data
 
 class ChallengeFeedbackForm(forms.Form):
-    challenge_uid = forms.CharField(max_length=32, widget=forms.HiddenInput())
     category = forms.ChoiceField(choices=FeedbackType.choices)
     text = forms.CharField(max_length=4 * 1024, widget=forms.Textarea)
 

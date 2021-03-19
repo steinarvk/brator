@@ -55,3 +55,8 @@ def format_percent(n):
 def format_probability(p):
     assert 0 <= p <= 1
     return str(round(p, 4))
+
+@register.simple_tag
+def format_probability_as_percent(p):
+    assert 0 <= p <= 1
+    return str(round(p * 100, 1)) + "%"
