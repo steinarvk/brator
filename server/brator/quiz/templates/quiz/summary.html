@@ -3,8 +3,8 @@
 <p>
 	In the last completed batch, you had
 	{{ summary.actual_correct }}/{{ summary.batch_size }} correct answers.
-	Based on your confidence,
-	{{ summary.expected_correct }} correct answers were expected.
+	Based on your stated confidence in your answers,
+	{% format_number summary.expected_correct %} correct answers were expected.
 </p>
 
 {% if summary.probability_fewer_correct > 0.75 %}
@@ -44,7 +44,7 @@
 
 <div class="columns is-vcentered">
 	<div class="column is-one-quarter">
-		Next batch
+		Next batch ({{ summary_progress.progress }}/{{ summary_progress.batch_size }})
 	</div>
 
 	<div class="column is-three-quarters">

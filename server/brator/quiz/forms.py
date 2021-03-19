@@ -7,7 +7,7 @@ from django.forms.widgets import NumberInput
 from django.core.exceptions import ValidationError
 
 class BooleanResponseForm(forms.Form):
-    confidence_percent = forms.DecimalField(widget=NumberInput(), label="Confidence assertion is true (percent)")
+    confidence_percent = forms.DecimalField(widget=NumberInput(), label="Confidence assertion is true (percent)", required=False)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -26,8 +26,8 @@ class BooleanResponseForm(forms.Form):
         return cleaned_data
 
 class NumericResponseForm(forms.Form):
-    ci_low = forms.DecimalField(widget=NumberInput(), label="Low (estimated 5th percentile)")
-    ci_high = forms.DecimalField(widget=NumberInput(), label="High (estimated 95th percentile)")
+    ci_low = forms.DecimalField(widget=NumberInput(), label="Low (estimated 5th percentile)", required=False)
+    ci_high = forms.DecimalField(widget=NumberInput(), label="High (estimated 95th percentile)", required=False)
 
     def clean(self):
         cleaned_data = super().clean()

@@ -46,14 +46,16 @@ def quiz(request):
     last_summary = get_last_summary(request.user, batch_size)
     batch_progress, _ = get_batch_progress(request.user, batch_size)
 
-    logger.info("Form class is: %s", formclass)
-
     if request.method == "POST":
         form = formclass(request.POST)
 
         responding_to = request.POST["challenge_uid"]
         if responding_to != challenge.uid:
             raise AlreadyResponded()
+
+        if "skip" in request.POST:
+            discard_current_challenge(request.user, challenge.uid)
+            return redirect(reverse("quiz:web-quiz"))
 
         if form.is_valid():
             payload = {challenge.challenge_type: form.cleaned_data}

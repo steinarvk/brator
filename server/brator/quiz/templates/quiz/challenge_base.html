@@ -15,7 +15,7 @@
 
 {% if show_response_answer %}
 <div class="user-answer">
-	Response:
+	Your answer:
 
 	{% block useranswer %}
 	{% endblock %}
@@ -30,3 +30,9 @@
 </div>
 {% endif %}
 
+{% if show_form %}
+<div class="user-answer">
+	{% block answerform %}
+	{% endblock %}
+</div>
+{% endif %}

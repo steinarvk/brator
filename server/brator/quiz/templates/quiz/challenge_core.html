@@ -3,6 +3,8 @@
 <div class="columns is-vcentered">
 <div class="column is-three-quarters">
 
+{% with challenge_uid=challenge.uid %}
+
 {% if challenge.boolean_challenge %}
 	{% include "quiz/boolean_challenge.html" with challenge=challenge.boolean_challenge %}
 {% elif challenge.numeric_challenge %}
@@ -12,6 +14,8 @@
 		Unknown kind of challenge ({{ challenge.challenge_type }}).
 	</div>
 {% endif %}
+
+{% endwith %}
 
 </div>
 <div class="column is-one-quarter">

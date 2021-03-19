@@ -22,3 +22,22 @@
 	{% endif %}
 {% endblock %}
 {% endif %}
+
+{% if show_form %}
+{% block answerform %}
+	<form method="post">
+	    {% csrf_token %}
+
+	    <input type="hidden" name="challenge_uid" value="{{ challenge_uid }}">
+
+	    <table>
+		    {{ form.as_table }}
+	    </table>
+
+	    <div class="buttons">
+	    <input type="submit" value="Submit answer" class="button is-primary" name="submit">
+	    <input type="submit" value="Skip" class="button is-warning" name="skip">
+	    </div>
+	</form>
+{% endblock %}
+{% endif %}

@@ -26,3 +26,45 @@
 	{% format_number challenge.fact.correct_answer %}
 {% endblock %}
 {% endif %}
+
+{% if show_form %}
+{% block answerform %}
+	<form method="post">
+	    {% csrf_token %}
+
+	    <input type="hidden" name="challenge_uid" value="{{ challenge_uid }}">
+
+	    {{ form.non_field_errors }}
+
+		<div class="field is-horizontal">
+			{{ form.ci_low.errors }}
+
+			<label class="field-label">Low (5th percentile)</label>
+			<div class="control">
+				{{ form.ci_low }}
+
+				{% if challenge.fact.correct_answer_unit != 'none' %}
+					{{ challenge.fact.correct_answer_unit }}
+				{% endif %}
+			</div>
+		</div>
+		<div class="field is-horizontal">
+			{{ form.ci_high.errors }}
+
+			<label class="field-label">Low (95th percentile)</label>
+			<div class="control">
+				{{ form.ci_high }}
+
+				{% if challenge.fact.correct_answer_unit != 'none' %}
+					{{ challenge.fact.correct_answer_unit }}
+				{% endif %}
+			</div>
+		</div>
+
+	    <div class="buttons">
+	    <input type="submit" value="Submit answer" class="button is-primary" name="submit">
+	    <input type="submit" value="Skip" class="button is-warning" name="skip">
+	    </div>
+	</form>
+{% endblock %}
+{% endif %}

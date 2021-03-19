@@ -9,25 +9,7 @@
 		</p>
 	</div>
 	<div class="card-content">
-		{% include "quiz/challenge_core.html" with challenge=challenge %}
-
-		<form method="post">
-		    {% csrf_token %}
-
-		    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
-
-		    <table>
-			    {{ form.as_table }}
-		    </table>
-
-		    <input type="submit" value="Submit answer" class="button is-primary">
-		</form>
-
-		<form method="post" action="{% url 'quiz:web-skip' %}" >
-		    {% csrf_token %}
-		    <input type="hidden" name="challenge_uid" value="{{ challenge.uid }}">
-		    <input type="submit" value="Skip question" class="button is-danger">
-		</form>
+		{% include "quiz/challenge_core.html" with challenge=challenge show_form=True %}
 	</div>
 </div>
 
@@ -48,7 +30,7 @@
 <div class="block card">
 	<div class="card-header">
 		<p class="card-header-title">
-		How am I doing?
+		Performance on last batch
 		</p>
 	</div>
 
