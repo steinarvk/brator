@@ -11,7 +11,14 @@
 {% endblock %}
 
 {% block content %}
-  {% include "quiz/evalchart.html" with chartid='mychart' %}
+  {% if charts %}
+  {% for chart in charts %}
+  	{% if chart.chart_data %}
+	{% include "quiz/evalchart.html" with chart_id=chart.chart_id chart_data=chart.chart_data %}
+	{% endif %}
+  {% endfor %}
+  {% endif %}
+ 
 
   {% include "quiz/evalstats.html" with stats=stats.total header='Overall' %}
   {% include "quiz/evalstats.html" with stats=stats.24h header='Last 24h' %}

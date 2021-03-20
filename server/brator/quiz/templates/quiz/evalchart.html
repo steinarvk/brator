@@ -1,12 +1,13 @@
-<canvas id="{{ chartid }}"
-	style="width: 100%; height: 5cm;"
+<canvas id="canvas-{{ chart_id }}"
+	class="calibration-chart"
+	style="width: 100%; height: 8cm;"
 >
 </canvas>
-{{ chartdata|json_script:"mydata" }}
+{{ chart_data|json_script:chart_id }}
 <script>
 (function() {
-	new Chart(document.getElementById("{{ chartid }}"),
-		 JSON.parse(document.getElementById('mydata').textContent));
+	new Chart(
+		document.getElementById("canvas-{{ chart_id }}"),
+		JSON.parse(document.getElementById('{{ chart_id }}').textContent));
 })();
-
 </script>

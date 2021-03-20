@@ -18,6 +18,7 @@ from ..logic import (
     get_batch_progress,
     get_largest_standard_summarized_batch_size,
     delete_user_account,
+    get_summary_chart_data,
 )
 from ..models import ChallengeFeedback
 from ..forms import CHALLENGE_FORMS
@@ -139,22 +140,13 @@ def answer_feedback(request, uid):
 def eval_results(request):
     context = get_eval_stats(request.user)
     context["user"] = request.user
-    context["chartid"] = "mychart"
-    context["chartdata"] = {
-	"type": "line",
-	"data": {
-                "labels": [str(i) for i in range(100)],
-		"datasets": [
-                    {
-                        "label": "Random points",
-			"data": [
-                            {"x": i, "y": random.random()}
-                            for i in range(100)
-			],
-                    },
-                ],
-	},
-    }
+    context["charts"] = [
+        {
+            "chart_id": f"chart_{bs}",
+            "chart_data": get_summary_chart_data(request.user, batch_size=bs)
+        }
+        for bs in (20, 50)
+    ]
     return render(request, "quiz/eval.html", context)
 
 @login_required

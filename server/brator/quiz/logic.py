@@ -348,3 +348,68 @@ def get_challenge_by_uid(user, uid):
 @traced_function
 def delete_user_account(user):
     user.delete()
+
+@traced_function
+def get_summary_chart_data(user, batch_size = None):
+    batch_size = batch_size or get_largest_standard_summarized_batch_size(user)
+
+    if not batch_size:
+        return None
+
+    timestamps = []
+    lower = []
+    upper = []
+
+    scores = SummaryScore.objects.filter(
+        user = user,
+        batch_size = batch_size,
+    ).all()
+
+    if not scores:
+        return None
+
+    for score in scores:
+        timestamps.append(score.creation_time.strftime("%Y-%m-%d %H:%M"))
+
+    return {
+	"type": "line",
+	"data": {
+                "labels": [str(x) for x in timestamps],
+		"datasets": [
+                    {
+                        "label": "Fewer (underconfident)",
+			"data": [x.probability_fewer_correct for x in scores],
+                        "borderColor": "#ffaaaa",
+                        "backgroundColor": "#ee9999",
+                    },
+                    {
+                        "label": "Same (calibrated)",
+			"data": [x.probability_same_correct for x in scores],
+                        "borderColor": "#aaffaa",
+                        "backgroundColor": "#99ee99",
+                    },
+                    {
+                        "label": "More (overconfident)",
+			"data": [x.probability_more_correct for x in scores],
+                        "borderColor": "#aaaaff",
+                        "backgroundColor": "#9999ee",
+                    },
+                ],
+	},
+        "options": {
+            "title": {
+                "display": True,
+                "text": f"Expected correct answers given calibration (batches of {batch_size})",
+            },
+            "tooltips": {
+                "mode": "index",
+            },
+            "scales": {
+                "yAxes": [
+                    {
+                        "stacked": True,
+                    },
+                ],
+            },
+        },
+    }
