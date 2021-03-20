@@ -317,6 +317,7 @@ def get_last_summary(user, batch_size=None):
     batch_size = batch_size or STANDARD_SUMMARY_BATCHES[0]
     return SummaryScore.objects.filter(
         user = user,
+        batch_size = batch_size,
     ).order_by("-creation_time").first()
 
 @traced_function
