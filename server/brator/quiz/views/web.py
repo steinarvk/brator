@@ -1,4 +1,6 @@
 import logging
+import random
+import json
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -137,6 +139,22 @@ def answer_feedback(request, uid):
 def eval_results(request):
     context = get_eval_stats(request.user)
     context["user"] = request.user
+    context["chartid"] = "mychart"
+    context["chartdata"] = {
+	"type": "line",
+	"data": {
+                "labels": [str(i) for i in range(100)],
+		"datasets": [
+                    {
+                        "label": "Random points",
+			"data": [
+                            {"x": i, "y": random.random()}
+                            for i in range(100)
+			],
+                    },
+                ],
+	},
+    }
     return render(request, "quiz/eval.html", context)
 
 @login_required

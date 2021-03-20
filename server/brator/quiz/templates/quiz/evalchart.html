@@ -1,0 +1,12 @@
+<canvas id="{{ chartid }}"
+	style="width: 100%; height: 5cm;"
+>
+</canvas>
+{{ chartdata|json_script:"mydata" }}
+<script>
+(function() {
+	new Chart(document.getElementById("{{ chartid }}"),
+		 JSON.parse(document.getElementById('mydata').textContent));
+})();
+
+</script>
