@@ -16,3 +16,6 @@ class Fact(BaseModel):
     category: Optional[str]
     numeric: Optional[NumericFact] = None
     boolean: Optional[BooleanFact] = None
+    source: Optional[str] = None
+    source_link: Optional[str] = None
+    fine_print: Optional[str] = None

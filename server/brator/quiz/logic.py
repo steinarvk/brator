@@ -181,6 +181,11 @@ def get_user_responses(user, limit):
         user = user,
     ).order_by("creation_time").reverse()[:limit]
 
+def _maybe_pop(d, k):
+    if k in d:
+        return d.pop(k)
+    return None
+
 @traced_function
 def post_fact(fact_data):
     fact_data = dict(fact_data)
@@ -202,9 +207,15 @@ def post_fact(fact_data):
 
     fact_type = list(fact_data)[0]
     fact_payload = list(fact_data.values())[0]
-    fact_hashable_obj = {
+    kwargs = {
         "category": category_name,
+        "source_link": _maybe_pop(fact_data, "source_link"),
+        "source": _maybe_pop(fact_data, "source"),
+        "fine_print": _maybe_pop(fact_data, "fine_print"),
+    }
+    fact_hashable_obj = {
         fact_type: fact_payload,
+        **kwargs,
     }
     fact_hashable = canonicaljson.encode_canonical_json(fact_hashable_obj)
 
@@ -225,14 +236,16 @@ def post_fact(fact_data):
 
     core = FACT_MODELS[fact_type].objects.create(**fact_payload)
 
+    kwargs["category"] = category
+    kwargs[field_name] = core
+
     Fact.objects.filter(key = key).update(active = False)
     return Fact.objects.create(
         key = key,
         active = True,
-        category = category,
         version_hash = fact_hash,
         fact_type = fact_type,
-        **{field_name: core},
+        **kwargs,
     )
 
 @traced_function
@@ -441,6 +454,9 @@ def export_facts(user):
         rv.append(apitype.Fact(
             key = obj.key,
             category = obj.category.name if obj.category else None,
+            fine_print = obj.fine_print,
+            source = obj.source,
+            source_link = obj.source_link,
             **kwargs,
         ))
 

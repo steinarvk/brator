@@ -2,6 +2,24 @@
 	{% block question %}
 	{% endblock %}
 
+	{% if fact.fine_print %}
+	<div span="fine-print">{{ fact.fine_print }}</div>
+	{% endif %}
+
+	{% if fact.source_link %}
+	<div class="fact-source">
+	<a	class="fact-source"
+		href="{{ fact.source_link }}">
+		{% if fact.source %}{{ fact.source }}
+		{% else %}{{ fact.source_link }}
+		{% endif %}
+	</a>
+	</div>
+	{% elif fact.source %}
+	<div class="fact-source">
+	<span class="fact-source">{{ fact.source }}</a>
+	</div>
+	{% endif %}
 </div>
 
 {% if show_answer %}

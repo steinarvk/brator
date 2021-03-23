@@ -169,6 +169,10 @@ class Fact(models.Model):
 
     category = models.ForeignKey(FactCategory, on_delete=models.SET_NULL, null=True)
 
+    fine_print = models.CharField(max_length = 1024, null=True)
+    source = models.CharField(max_length = 1024, null=True)
+    source_link = models.CharField(max_length = 1024, null=True)
+
     fact_type = TagField(FactType)
 
     version_hash = models.CharField(max_length = 200, null=True)
