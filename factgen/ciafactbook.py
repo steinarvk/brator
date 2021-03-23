@@ -19,6 +19,13 @@ def get_factbook_json():
         json.dump(data, f, indent="  ")
     return data
 
+def _snone(s):
+    if not s:
+        return None
+    if s.lower() == "none":
+        return None
+    return s
+
 def get_countries():
     data = get_factbook_json()
     for country in data["countries"].values():
@@ -31,9 +38,9 @@ def get_countries():
         if "UN" not in orgs:
             continue
 
-        name = names["conventional_short_form"]
-
-        yield name, country["data"]
+        name = _snone(names.get("conventional_short_form")) or _snone(names.get("conventional_long_form"))
+        if name:
+            yield name, country["data"]
 
 def get_country_population_facts():
     for name, data in get_countries():
