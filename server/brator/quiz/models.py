@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
+from . import apitype
+
 import re
 import inspect
 
@@ -70,10 +72,27 @@ class BooleanFact(models.Model):
     question_text = models.TextField()
     correct_answer = models.BooleanField()
 
+    def export(self):
+        return {
+            "boolean": {
+                "question_text": self.question_text,
+                "correct_answer": self.correct_answer,
+            },
+        }
+
 class NumericFact(models.Model):
     question_text = models.TextField()
     correct_answer_unit = models.CharField(max_length=32, choices = Unit.choices)
     correct_answer = NumericField()
+
+    def export(self):
+        return {
+            "numeric": {
+                "question_text": self.question_text,
+                "correct_answer_unit": self.correct_answer_unit,
+                "correct_answer": self.correct_answer,
+            },
+        }
 
     def clean(self):
         valid = [x[0] for x in Unit.choices]

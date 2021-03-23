@@ -11,3 +11,7 @@ class AlreadyResponded(APIException):
 class NoFactsAvailable(APIException):
     status_code = 500
     default_detail = "No facts available."
+
+class PermissionDenied(APIException):
+    status_code = 403
+    default_detail = "Permission denied."

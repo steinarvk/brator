@@ -1,11 +1,16 @@
 import json
+import functools
+import base64
 import logging
 
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
+from rest_framework.exceptions import APIException
 
 from ..models import Fact
 from ..serializers import FactFullSerializer, ChallengeSerializer, ScoreSerializer
@@ -15,6 +20,7 @@ from ..logic import discard_current_challenge
 from ..logic import respond_to_challenge
 from ..logic import get_user_responses
 from ..logic import post_fact
+from ..logic import export_facts
 
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -66,3 +72,66 @@ class FactViewSet(viewsets.ViewSet):
         logger.info("Creating fact: %s", repr(fact_data))
         fact = post_fact(fact_data)
         return Response(FactFullSerializer(fact).data)
+
+def api_view(f):
+    @functools.wraps(f)
+    def wrapped(request, *args, **kwargs):
+        try:
+            if "HTTP_AUTHORIZATION" in request.META:
+                method, creds = request.META["HTTP_AUTHORIZATION"].split()
+                assert method.lower() == "basic"
+                username, password = base64.b64decode(creds).decode().split(":")
+                user = authenticate(username=username, password=password)
+                if user and user.is_active:
+                    login(request, user)
+                    request.user = user
+
+            return f(request, *args, **kwargs)
+        except APIException as e:
+            return HttpResponse(
+                json.dumps({
+                    "ok": False,
+                    "status": "error",
+                    "error_message": e.detail,
+                    "status_code": e.status_code,
+                }, indent=4),
+                content_type = "application/json",
+                status = e.status_code,
+            )
+    return wrapped
+
+@api_view
+def export_facts_view(request):
+    data = export_facts(request.user)
+    serialized = json.dumps(data, indent="  ")
+    return HttpResponse(
+        serialized,
+        content_type = "application/json",
+    )
+
+@api_view
+@csrf_exempt
+def import_facts_view(request):
+    if not request.user.is_staff:
+        return HttpResponse("Permission denied", status_code=403)
+
+    if not request.method == "POST":
+        return HttpResponse("Wrong method", status_code=405)
+        
+    fact_data = json.loads(request.body)
+    if isinstance(fact_data, dict):
+        fact_data = [fact_data]
+
+    for x in fact_data:
+        logger.info("Posting fact: %s", repr(x))
+        resp = post_fact(x)
+        logger.info("Posted fact: %s ==> %s", repr(x), repr(resp))
+
+    rv = {"imported": len(fact_data)}
+
+    serialized = json.dumps(rv, indent="  ")
+
+    return HttpResponse(
+        serialized,
+        content_type = "application/json",
+    )

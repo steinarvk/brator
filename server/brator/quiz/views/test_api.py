@@ -83,19 +83,19 @@ class FactsListTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_get_facts_0(self):
-        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 0
+        assert len(self.client.get(reverse("quiz:api-facts-export")).json()) == 0
 
     def test_get_facts_1(self):
         create_numeric_fact()
-        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 1
+        assert len(self.client.get(reverse("quiz:api-facts-export")).json()) == 1
 
     def test_get_facts_2(self):
         create_numeric_fact()
         create_boolean_fact()
-        assert len(self.client.get(reverse("quiz:facts-list")).json()) == 2
+        assert len(self.client.get(reverse("quiz:api-facts-export")).json()) == 2
 
     def test_post_fact(self):
-        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA[0])
         assert 200 <= resp.status_code <= 399
         assert resp.json()
 
@@ -109,7 +109,7 @@ class FactsListTest(TestCase):
             },
         }
         assert Fact.objects.count() == 0
-        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=factdata)
+        resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=factdata)
         assert 200 <= resp.status_code <= 299
         assert Fact.objects.count() == 1
 
@@ -124,7 +124,7 @@ class FactsListTest(TestCase):
             },
         }
         assert Fact.objects.count() == 0
-        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=factdata)
+        resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=factdata)
         assert 200 <= resp.status_code <= 299
         assert Fact.objects.count() == 1
 
@@ -135,7 +135,7 @@ class FactsListTest(TestCase):
             "catfact": "miaow",
         }
         with pytest.raises(Exception):
-            resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=bad_fact)
+            resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=bad_fact)
 
     def test_post_doubly_bad_fact(self):
         bad_fact = {
@@ -143,32 +143,37 @@ class FactsListTest(TestCase):
             "catfact": "miaow",
             "dogfact": "woof",
         }
-        resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=bad_fact)
+        resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=bad_fact)
         assert 400 <= resp.status_code <= 499
 
     def test_post_fact_and_count(self):
         assert Fact.objects.count() == 0
-        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA[0])
         assert Fact.objects.count() == 1
 
     def test_post_all_facts(self):
         for x in DUMMY_FACT_DATA:
-            resp = self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=x)
+            resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=x)
             assert 200 <= resp.status_code <= 399
             assert resp.json()
 
+    def test_post_all_facts_at_once(self):
+        resp = self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA)
+        assert 200 <= resp.status_code <= 399
+        assert resp.json()
+
     def test_get_facts(self):
-        resp = self.client.get(reverse("quiz:facts-list"))
+        resp = self.client.get(reverse("quiz:api-facts-export"))
         assert 200 == resp.status_code
         assert resp.json() == []
 
     def test_post_same_fact_twice(self):
         assert Fact.objects.count() == 0
-        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA[0])
         assert Fact.objects.count() == 1
-        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[0])
+        self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA[0])
         assert Fact.objects.count() == 1
-        self.client.post(reverse("quiz:facts-list"), content_type="application/json", data=DUMMY_FACT_DATA[1])
+        self.client.post(reverse("quiz:api-facts-import"), content_type="application/json", data=DUMMY_FACT_DATA[1])
         assert Fact.objects.count() == 2
 
 

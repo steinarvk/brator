@@ -5,6 +5,8 @@ import datetime
 import logging
 import random
 
+from . import apitype
+
 import beeline
 
 STANDARD_SUMMARY_BATCHES = [20, 50]
@@ -36,6 +38,7 @@ from .exceptions import (
     BadRequest,
     AlreadyResponded,
     NoFactsAvailable,
+    PermissionDenied,
 )
 
 logger = logging.getLogger(__name__)
@@ -414,3 +417,31 @@ def get_summary_chart_data(user, batch_size = None):
             },
         },
     }
+
+@traced_function
+def export_facts(user):
+    if not user.is_staff:
+        logger.info("User (%s) is not staff user: refusing export", repr(user))
+        raise PermissionDenied()
+
+    qs = Fact.objects.filter(
+        active = True,
+    ).select_related("category")
+
+    logger.info("Exporting %d facts.", qs.count())
+
+    rv = []
+
+    for obj in qs.order_by("pk"):
+        attrname = obj.fact_type + "_fact"
+        kwargs = getattr(obj, attrname).export()
+
+        logger.info("Exporting fact: %s (cat: %s)", repr(obj), repr(obj.category))
+
+        rv.append(apitype.Fact(
+            key = obj.key,
+            category = obj.category.name if obj.category else None,
+            **kwargs,
+        ))
+
+    return [{k: v for k, v in x.dict().items() if v} for x in rv]
