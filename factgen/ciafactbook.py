@@ -4,6 +4,10 @@ import json
 
 URI = "https://raw.githubusercontent.com/iancoleman/cia_world_factbook_api/master/data/factbook.json"
 CACHE = "factbook.cache.json"
+META = {
+    "source": "CIA World Factbook (in JSON by iancoleman)",
+    "source_link": URI,
+}
 
 def get_factbook_json():
     try:
@@ -46,15 +50,17 @@ def get_country_population_facts():
     for name, data in get_countries():
         population = data["people"]["population"]["total"]
         datestamp = data["people"]["population"]["date"]
-        text = f"What is the total population of {name}? [Total population according to the CIA World Factbook, as of {datestamp}.]"
+        text = f"What is the total population of {name}?"
         yield {
             "key": "cia-population-" + "-".join(name.split()).lower(),
             "category": "cia-position",
+            "fine_print": f"As of {datestamp}.",
             "numeric": {
                 "question_text": text,
                 "correct_answer": int(population),
                 "correct_answer_unit": "none",
             },
+            **META,
         }
 
 def get_capital_location_facts():
@@ -76,16 +82,18 @@ def get_capital_location_facts():
             "S": "southern hemisphere",
         }[hemisphere]
         full_name = f"{capital['name']}, {name}"
-        question = f"What's the latitude (within the {hem_name}) of {full_name}? [Truncated to an integral minute; between 0 and 90.]"
+        question = f"What's the latitude (within the {hem_name}) of {full_name}?"
 
         yield {
             "key": "cia-capital-latitude-" + "-".join(full_name.split(", ")).lower(),
             "category": "cia-capital-position",
+            "fine_print": "Truncated to an integral minute, i.e. between 0 and 90.",
             "numeric": {
                 "question_text": question,
                 "correct_answer": lat,
                 "correct_answer_unit": "none",
             },
+            **META,
         }
 
 def get_land_area_facts():
@@ -100,7 +108,7 @@ def get_land_area_facts():
 
         key = "cia-country-land-area-" + "-".join(name.split()).lower()
 
-        text = f"What's the total land area of {name}? [According to the CIA World Factbook, in square kilometers.]"
+        text = f"What's the total land area of {name}?"
 
         yield {
             "key": key,
@@ -110,6 +118,7 @@ def get_land_area_facts():
                 "correct_answer": land_area,
                 "correct_answer_unit": "sq km",
             },
+            **META,
         }
 
 def _keyify(s):
@@ -131,17 +140,19 @@ def get_demographics_facts():
 
             pct = catdata["percent"]
 
-            question = f"What percentage of the population of {name} is between {age0} and {age1} years old? [According to the CIA World Factbook, as of {datestamp}.]"
+            question = f"What percentage of the population of {name} is between {age0} and {age1} years old?"
             key = f"cia-demo-{_keyify(name)}-ages-{age0}-to-{age1}"
 
             yield {
                 "key": key,
                 "category": "cia-demographics",
+                "fine_print": f"As of {datestamp}.",
                 "numeric": {
                     "question_text": question,
                     "correct_answer": pct,
                     "correct_answer_unit": "percent",
                 },
+                **META,
             }
 
 
