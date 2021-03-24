@@ -21,6 +21,8 @@ from ..logic import respond_to_challenge
 from ..logic import get_user_responses
 from ..logic import post_fact
 from ..logic import export_facts
+from ..logic import export_fact_categories
+from ..logic import post_fact_category
 
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -88,6 +90,7 @@ def api_view(f):
 
             return f(request, *args, **kwargs)
         except APIException as e:
+            logger.exception(f"Returning HTTP {e.status_code}")
             return HttpResponse(
                 json.dumps({
                     "ok": False,
@@ -119,6 +122,7 @@ def import_facts_view(request):
         return HttpResponse("Wrong method", status_code=405)
         
     fact_data = json.loads(request.body)
+    logger.info("Import body is: %d %s", len(fact_data), type(fact_data))
     if isinstance(fact_data, dict):
         fact_data = [fact_data]
 
@@ -128,6 +132,43 @@ def import_facts_view(request):
         logger.info("Posted fact: %s ==> %s", repr(x), repr(resp))
 
     rv = {"imported": len(fact_data)}
+
+    serialized = json.dumps(rv, indent="  ")
+
+    return HttpResponse(
+        serialized,
+        content_type = "application/json",
+    )
+
+@api_view
+def export_fact_categories_view(request):
+    data = export_fact_categories(request.user)
+    serialized = json.dumps(data, indent="  ")
+    return HttpResponse(
+        serialized,
+        content_type = "application/json",
+    )
+
+@api_view
+@csrf_exempt
+def import_fact_categories_view(request):
+    if not request.user.is_staff:
+        return HttpResponse("Permission denied", status_code=403)
+
+    if not request.method == "POST":
+        return HttpResponse("Wrong method", status_code=405)
+        
+    factcat_data = json.loads(request.body)
+    logger.info("Import body is: %d %s", len(factcat_data), type(factcat_data))
+    if isinstance(factcat_data, dict):
+        factcat_data = [factcat_data]
+
+    for x in factcat_data:
+        logger.info("Posting factcat: %s", repr(x))
+        resp = post_fact_category(x)
+        logger.info("Posted factcat: %s ==> %s", repr(x), repr(resp))
+
+    rv = {"imported": len(factcat_data)}
 
     serialized = json.dumps(rv, indent="  ")
 

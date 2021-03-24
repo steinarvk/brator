@@ -1,6 +1,7 @@
 import secrets
 import canonicaljson
 import hashlib
+import decimal
 import datetime
 import logging
 import random
@@ -202,17 +203,18 @@ def post_fact(fact_data):
 
     logger.info("Attempting to post new fact (with key: %s)", key)
 
-    if len(fact_data) != 1:
-        raise BadRequest(f"Invalid fact data (unknown type): {' '.join(fact_data)}")
-
-    fact_type = list(fact_data)[0]
-    fact_payload = list(fact_data.values())[0]
     kwargs = {
         "category": category_name,
         "source_link": _maybe_pop(fact_data, "source_link"),
         "source": _maybe_pop(fact_data, "source"),
         "fine_print": _maybe_pop(fact_data, "fine_print"),
     }
+
+    if len(fact_data) != 1:
+        raise BadRequest(f"Invalid fact data (unknown type): {' '.join(fact_data)}")
+
+    fact_type = list(fact_data)[0]
+    fact_payload = list(fact_data.values())[0]
     fact_hashable_obj = {
         fact_type: fact_payload,
         **kwargs,
@@ -461,3 +463,41 @@ def export_facts(user):
         ))
 
     return [{k: v for k, v in x.dict().items() if v} for x in rv]
+
+@traced_function
+def export_fact_categories(user):
+    if not user.is_staff:
+        logger.info("User (%s) is not staff user: refusing export", repr(user))
+        raise PermissionDenied()
+
+    qs = FactCategory.objects.all()
+
+    logger.info("Exporting %d fact categories.", qs.count())
+
+    rv = []
+
+    for obj in qs.order_by("pk"):
+        rv.append(apitype.FactCategory(
+            name = obj.name,
+            weight = decimal.Decimal(obj.weight),
+        ))
+
+    return [{k: v for k, v in x.dict().items() if v} for x in rv]
+
+@traced_function
+def post_fact_category(cat_data):
+    cat = apitype.FactCategory.parse_obj(cat_data)
+
+    old_cat = FactCategory.objects.filter(
+        name = cat.name,
+    ).first()
+
+    if old_cat:
+        old_cat.weight = cat.weight
+        old_cat.save()
+        return
+
+    return FactCategory.objects.create(
+        name = cat.name,
+        weight = cat.weight,
+    )

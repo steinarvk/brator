@@ -19,3 +19,7 @@ class Fact(BaseModel):
     source: Optional[str] = None
     source_link: Optional[str] = None
     fine_print: Optional[str] = None
+
+class FactCategory(BaseModel):
+    name: str
+    weight: float

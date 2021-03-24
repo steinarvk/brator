@@ -157,7 +157,7 @@ class FactCategory(models.Model):
         return f"FactCategory(name={repr(self.name)}, weight={repr(self.weight)})"
 
     def clean(self):
-        if not re.match(r"^[a-z-]+$", self.name):
+        if not re.match(r"^[a-z0-9-]+$", self.name):
             raise ValidationError(f"Invalid category name: {self.name}")
 
 

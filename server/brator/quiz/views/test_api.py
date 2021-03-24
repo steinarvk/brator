@@ -314,3 +314,57 @@ class EvalTest(TestCase):
         assert len(data) == 1
         assert data[0]["correct"] == True
         assert data[0]["confidence_percent"] == "75.00"
+
+class FactCategoriesListTest(TestCase):
+    def setUp(self):
+        self.superuser = create_superuser()
+        self.client.force_login(self.superuser)
+
+    def test_get_categories_0(self):
+        assert len(self.client.get(reverse("quiz:api-categories-export")).json()) == 0
+
+    def test_post_category(self):
+        assert self.client.post(
+            reverse("quiz:api-categories-import"),
+            content_type="application/json",
+            data={
+                "name": "my-category",
+                "weight": 3,
+            },
+        ).status_code == 200
+        assert len(self.client.get(reverse("quiz:api-categories-export")).json()) == 1
+
+    def test_post_category_twice(self):
+        for i in range(2):
+            assert self.client.post(
+                reverse("quiz:api-categories-import"),
+                content_type="application/json",
+                data={
+                    "name": "my-category",
+                    "weight": 3,
+                },
+            ).status_code == 200
+        assert len(self.client.get(reverse("quiz:api-categories-export")).json()) == 1
+
+    def test_post_categories(self):
+        for i in range(2):
+            assert self.client.post(
+                reverse("quiz:api-categories-import"),
+                content_type="application/json",
+                data={
+                    "name": f"my-category-{i}",
+                    "weight": 3,
+                },
+            ).status_code == 200
+        assert len(self.client.get(reverse("quiz:api-categories-export")).json()) == 2
+
+    def test_post_categories_at_once(self):
+        assert self.client.post(
+            reverse("quiz:api-categories-import"),
+            content_type="application/json",
+            data=[
+                {"name": "my-cat", "weight": 42},
+                {"name": "my-dog", "weight": 123},
+            ],
+        ).status_code == 200
+        assert len(self.client.get(reverse("quiz:api-categories-export")).json()) == 2
