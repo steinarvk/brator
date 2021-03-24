@@ -8,6 +8,7 @@
 
 	{% if fact.source_link %}
 	<div class="fact-source">
+        Source:
 	<a	class="fact-source"
 		href="{{ fact.source_link }}">
 		{% if fact.source %}{{ fact.source }}
@@ -17,6 +18,7 @@
 	</div>
 	{% elif fact.source %}
 	<div class="fact-source">
+        Source:
 	<span class="fact-source">{{ fact.source }}</a>
 	</div>
 	{% endif %}

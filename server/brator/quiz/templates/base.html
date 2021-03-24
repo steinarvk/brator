@@ -51,6 +51,12 @@
 				</a>
 			</div>
 			<div class="navbar-end">
+				{% if user.is_authenticated %}
+				<div class="navbar-item">
+					{{ user.username }}
+				</div>
+				{% endif %}
+
 				<div class="navbar-item">
 					<div class="buttons">
 						<a class="button is-info" href="{% url 'quiz:web-account' %}">Account</a>
