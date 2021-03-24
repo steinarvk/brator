@@ -66,6 +66,7 @@ class Unit(models.TextChoices):
     KM = "km"
     KM_PER_SECOND = "km/s"
     METERS_PER_SECOND_SQUARED = "m/s²"
+    DAYS = "days"
 
 
 class BooleanFact(models.Model):
