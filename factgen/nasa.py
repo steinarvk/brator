@@ -7,6 +7,10 @@ from bs4 import BeautifulSoup
 
 URI = "https://nssdc.gsfc.nasa.gov/planetary/factsheet/"
 CACHE = "nasafactsheet.cache.html"
+META = {
+    "source": "Dr. David R. Williams, NASA Goddard Space Flight Center",
+    "source_link": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+}
 
 REMAP_NAMES = {"MOON": "the Moon"}
 
@@ -52,6 +56,7 @@ def get_diameter_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "km",
             },
+            **META,
         }
 
 def get_mass_facts():
@@ -65,7 +70,25 @@ def get_mass_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "1E24 kg",
             },
+            **META,
         }
+
+def get_relative_mass_facts():
+    planets = dict(get_planets_table())
+    for planetA, propsA in planets.items():
+        for planetB, propsB in planets.items():
+            if planetA == planetB:
+                continue
+            a_bigger = float(propsA["Mass (1024kg)"]) > float(propsB["Mass (1024kg)"])
+            yield {
+                "key": f"nasa-planet-mass-relative-{planetA.lower()}-{planetB.lower()}",
+                "category": "nasa-planet-mass-relative",
+                "boolean": {
+                    "question_text": f"{planetA} is a more massive planet than {planetB}.",
+                    "correct_answer": a_bigger,
+                },
+                **META,
+            }
 
 def get_aphelion_perihelion_facts():
     for planet, props in get_planets_table().items():
@@ -78,6 +101,7 @@ def get_aphelion_perihelion_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "1E6 km",
             },
+            **META,
         }
 
         value = float(props["Perihelion (106 km)"])
@@ -89,6 +113,7 @@ def get_aphelion_perihelion_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "1E6 km",
             },
+            **META,
         }
 
 def get_gravity_facts():
@@ -102,6 +127,7 @@ def get_gravity_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "m/s²",
             },
+            **META,
         }
 
 def get_escape_velocity_facts():
@@ -115,6 +141,7 @@ def get_escape_velocity_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "km/s",
             },
+            **META,
         }
 
 def get_length_of_day_facts():
@@ -128,6 +155,7 @@ def get_length_of_day_facts():
                 "correct_answer": value,
                 "correct_answer_unit": "hours",
             },
+            **META,
         }
 
 def get_orbital_period_facts():
@@ -139,8 +167,9 @@ def get_orbital_period_facts():
             "numeric": {
                 "question_text": f"What's the orbital period of {planet}, i.e. the time it takes to complete one orbit around the sun, in Earth days?",
                 "correct_answer": value,
-                "correct_answer_unit": "hours",
+                "correct_answer_unit": "days",
             },
+            **META,
         }
 
 def get_facts():
@@ -151,6 +180,7 @@ def get_facts():
     yield from get_escape_velocity_facts()
     yield from get_length_of_day_facts()
     yield from get_orbital_period_facts()
+    yield from get_relative_mass_facts()
 
 if __name__ == "__main__":
     json.dump(list(get_facts()), sys.stdout, indent="  ")
