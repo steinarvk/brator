@@ -9,8 +9,11 @@ if __name__ == "__main__":
     endpoint = os.environ.get("BRATOR_FACTS_URL") or sys.argv[1]
     chunk = []
     def flush():
-        resp = sess.post(endpoint, json=fact, allow_redirects=False)
-        print(resp.json())
+        resp = sess.post(endpoint, json=chunk, allow_redirects=False)
+        try:
+            print(resp.json())
+        except:
+            print(resp.content)
         resp.raise_for_status()
         print(chunk[-1]["key"], len(chunk), resp.status_code, len(resp.content), resp.history)
         chunk.clear()
