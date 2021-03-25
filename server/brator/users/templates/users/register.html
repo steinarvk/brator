@@ -1,13 +1,54 @@
 {% extends 'base.html' %}
 
+{% block titlesuffix %} - Register{% endblock %}
+
 {% block content %}
-	<h2>Register</h2>
+<form method="post">
+        {% csrf_token %}
 
-	<form method="post">
-	    {% csrf_token %}
-	    {{form}}
-	    <input type="submit" value="Register">
-	</form>
+        <div class="field">
+                <label class="label">Username</label>
+                <div class="control">
+                        <input type="text" name="username">
+                </div>
 
-	<a href="{% url 'users:login' %}">Back to login</a>
+                {% if form.username.errors %}
+                <p class="help is-danger">
+                        {{ form.username.errors }}
+                </p>
+                {% endif %}
+        </div>
+
+        <div class="field">
+                <label class="label">Password</label>
+                <div class="control">
+                        <input type="password" name="password1">
+                </div>
+
+                {% if form.password1.errors %}
+                <p class="help is-danger">
+                        {{ form.password1.errors }}
+                </p>
+                {% endif %}
+        </div>
+
+        <div class="field">
+                <label class="label">Repeat password</label>
+                <div class="control">
+                        <input type="password" name="password2">
+                </div>
+
+                {% if form.password2.errors %}
+                <p class="help is-danger">
+                        {{ form.password2.errors }}
+                </p>
+                {% endif %}
+        </div>
+
+        <div class="field">
+                <div class="control">
+                        <input class="button is-success" type="submit" value="Register">
+                </div>
+        </div>
+</form>
 {% endblock %}

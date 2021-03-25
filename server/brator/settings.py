@@ -25,6 +25,8 @@ ALLOWED_HOSTS = list(x for x in os.environ.get("BRATOR_ALLOWED_HOSTS", "").split
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "compressor",
+    "brator.quiz",
+    "brator.users",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,8 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",
-    "brator.quiz",
-    "brator.users",
 ]
 
 MIDDLEWARE = [
