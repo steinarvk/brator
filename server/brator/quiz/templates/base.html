@@ -8,6 +8,8 @@
 <head>
     <title>Brator{% block titlesuffix %}{% endblock %}</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     {% compress css %}
     	<link type="text/x-scss"
 	      href="{% static 'quiz.scss' %}"
@@ -64,7 +66,7 @@
 						{% if user.is_authenticated %}
 						<a class="button is-danger" href="{% url 'users:logout' %}">Log out</a>
 						{% else %}
-						<a class="button is-success" href="{% url 'users:logout' %}">Log in</a>
+						<a class="button is-success" href="{% url 'users:login' %}">Log in</a>
 						{% endif %}
 					</div>
 				</div>
