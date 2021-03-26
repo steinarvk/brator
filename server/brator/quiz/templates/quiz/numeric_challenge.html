@@ -64,6 +64,23 @@
 	    <div class="buttons">
 	    <input type="submit" value="Submit answer" class="button is-primary" name="submit">
 	    <input type="submit" value="Skip" class="button is-warning" name="skip">
+
+                <div class="dropdown is-hoverable is-up is-right">
+                  <div class="dropdown-trigger">
+                    <button class="button" aria-haspopup="true" aria-controls="dropdown-helptext" type="button">
+                      <span>?</span>
+                    </button>
+                  </div>
+                  <div class="dropdown-menu" id="dropdown-helptext" role="menu">
+                    <div class="dropdown-content">
+                      <div class="dropdown-item">
+			  Specify a low and a high number, so that you believe there's a 90% chance
+			  that the true answer falls within the two (inclusive).
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
 	    </div>
 	</form>
 {% endblock %}

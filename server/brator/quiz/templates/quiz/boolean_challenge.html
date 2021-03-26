@@ -37,6 +37,25 @@
 	    <div class="buttons">
 	    <input type="submit" value="Submit answer" class="button is-primary" name="submit">
 	    <input type="submit" value="Skip" class="button is-warning" name="skip">
+
+                <div class="dropdown is-hoverable is-up is-right">
+                  <div class="dropdown-trigger">
+                    <button class="button" aria-haspopup="true" aria-controls="dropdown-helptext" type="button">
+                      <span>?</span>
+                    </button>
+                  </div>
+                  <div class="dropdown-menu" id="dropdown-helptext" role="menu">
+                    <div class="dropdown-content">
+                      <div class="dropdown-item">
+			  Specify your confidence that the assertion is <b>true</b>.
+			  If you think it's definitely false, answer 0%.
+			  If you think it's definitely true, answer 100%.
+			  If you think it's equally likely to be true or false, answer 50%.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
 	    </div>
 	</form>
 {% endblock %}
